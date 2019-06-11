@@ -10,6 +10,7 @@ import { FooterComponent } from './footer/footer.component';
 import { HowtoComponent } from './howto/howto.component';
 import { TrainComponent } from './train/train.component';
 import { HotkeysService, HotkeyModule } from 'angular2-hotkeys';
+import { ScoresComponent } from './scores/scores.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { HotkeysService, HotkeyModule } from 'angular2-hotkeys';
     WelcomeComponent,
     FooterComponent,
     HowtoComponent,
-    TrainComponent
+    TrainComponent,
+    ScoresComponent
   ],
   imports: [
     BrowserModule,

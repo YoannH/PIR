@@ -1,0 +1,59 @@
+<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"> 
+<div class="scoresScreen">
+	<div class="scoresTitle" ng-if="language=='english'">
+		<i class="fa fa-trophy" aria-hidden="true"></i> Best scores: 
+	</div>
+	<div class="scoresTitle" ng-if="language=='french'">
+		<i class="fa fa-trophy" aria-hidden="true"></i> Meilleurs scores: 
+	</div>
+	<div class="scoresPages">
+		<div class="bestScores" ng-repeat="(pagekey, value) in pagesArray" ng-class="{divleft: divleft[pagekey], divright: divright[pagekey]}">
+			<div class="scoresNames">
+				<span ng-if="language=='english'"> NAME </span>
+				<span ng-if="language=='french'"> NOM </span>
+				<div ng-repeat="(key, value) in pagesArray[pagekey]">
+					<i class="fa fa-fire-extinguisher" aria-hidden="true"></i> {{value.name}}
+				</div>
+			</div>
+			<div class="scoresValues">
+				<span> SCORE </span>
+				<div ng-repeat="(key, value) in pagesArray[pagekey]">
+					{{value.score}}
+				</div>
+			</div>
+			<div class="scoresDates">
+				<span> DATE </span>
+				<div ng-repeat="(key, value) in pagesArray[pagekey]">
+					{{value.date}}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="controlBand">
+		<div ui-sref="welcome" class="scoresGohome" ng-if="language=='english'"> <i class="fa fa-reply" aria-hidden="true"></i> back to main menu 
+		</div> 
+		<div ui-sref="welcome" class="scoresGohome" ng-if="language=='french'"> <i class="fa fa-reply" aria-hidden="true"></i> retour au menu principal
+		</div> 
+		<div class="nextprev">
+			<div class="scoresGohome"> 
+				<div ng-hide="firstPage" ng-click="previousPage()" ng-if="language=='english'"> 
+					<i class="fa fa-chevron-left" aria-hidden="true"></i> previous page 
+				</div> 
+				<div ng-hide="firstPage" ng-click="previousPage()" ng-if="language=='french'"> 
+					<i class="fa fa-chevron-left" aria-hidden="true"></i> page précédente
+				</div> 
+			</div>
+			<div class="scoresGohome" > 
+				<div ng-hide="lastPage" ng-click="nextPage()" ng-if="language=='english'"> 				
+					<i class="fa fa-chevron-right" aria-hidden="true"></i> next page
+				</div>
+				<div ng-hide="lastPage" ng-click="nextPage()" ng-if="language=='french'"> 				
+					<i class="fa fa-chevron-right" aria-hidden="true"></i> page suivante
+				</div>
+			</div>
+			<div class="scorespage" > 
+				page {{pageNumber}}
+			</div>	
+		</div>
+	</div>
+</div>
