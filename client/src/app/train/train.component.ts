@@ -127,7 +127,7 @@ export class TrainComponent implements OnInit {
       } else if(this.xRobinet < 0) {
           this.xRobinet = 0;
       }
-      this.xRobinet += this.decal;
+      //this.xRobinet += this.decal;
       this.faucetXAxis = (this.xRobinet - 40) * 10 / 40;
       this.yRobinet = this.coeffXRob * Math.cos(this.faucetXAxis* this.piValue *2 / 20) + this.constXRob;
 
