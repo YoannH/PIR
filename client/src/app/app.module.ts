@@ -22,7 +22,7 @@ import { AboutComponent } from './about/about.component';
     FooterComponent,
     HowtoComponent,
     TrainComponent,
-    ScoresComponent
+    ScoresComponent,
     MainComponent,
     VideodemoComponent,
     AboutComponent
