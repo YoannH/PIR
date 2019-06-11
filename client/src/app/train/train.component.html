@@ -1,6 +1,6 @@
 <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"> 
 
-<div class="train"  [ngClass]="{'screenWrenchTrain': wrenchmodeTrain}">
+<div class="train"  [ngClass]="{'screenWrenchTrain': wrenchModeTrain}">
 	<div class="screenTrain">
 		<div class="twoparts">
 			<div class="watermngttrain">
@@ -19,7 +19,7 @@
 							</div>
 							<div class="string" [ngStyle]="{left: xRobinet+11.5+'%', bottom: yRobinet/1.8+54+'%'}"> 
 							</div>
-							<div class="robinetwaterContainer" [ngStyle]="{left: xRobinetWater-0.6+'%', bottom: yRobinet/1.8 + 41 +'%'}">
+							<div class="robinetwaterContainer" [ngStyle]="{left: xRobinet+decal-0.6+'%', bottom: yRobinet/1.8 + 41 +'%'}">
 								<div class="robinetwater" [ngStyle]="{width: waterWidth + 'vw', 'background-size': waterWidth + 'vw 1vw'}">				
 								</div>
 							</div>
@@ -38,7 +38,7 @@
 								<div class="tankcontainerleakspart">
 									<div class="wrapLeaks">
 									<div class="leakContainer" *ngFor="let value of leakPlaces, let key = index">
-										<div class="leak" [ngClass]="{nonvisible: noLeakAt[key]}" [ngStyle]="{'transform': 'scale(' + leaksReverse[key] + ', 1)', 'left': leftValues[key] + '%'}"  click="clickLeak(key)">
+										<div class="leak" [ngClass]="{nonvisible: noLeakAt[key]}" [ngStyle]="{'transform': 'scale(' + leaksReverse[key] + ', 1)', 'left': leftValues[key] + '%'}"  (click)="clickLeak(key)">
 										</div>
 									</div>
 								</div>
@@ -57,14 +57,14 @@
 								</div>
 								<div class="buttonWheel">
 									<div class="buttonChar">
-										<div class="mainbuttonL" [ngClass]="{'cursorPointer': !wrenchModeTrain}" (click)="faucetCtrlFctMinus()"> 
+										<div class="mainbuttonL" [ngClass]="{cursorPointer: !wrenchModeTrain}" (click)="faucetCtrlFctMinus()"> 
 											<i class="fa fa-undo" aria-hidden="true"></i>
 											<div class="wheelsmall"> </div>
 										</div>
 										<div class="char"> s </div>
 									</div>
 									<div class="buttonletterChar">
-										<div class="mainbuttonR" [ngClass]="{'cursorPointer': !wrenchModeTrain}" ng-click="faucetCtrlFctPlus()"> 
+										<div class="mainbuttonR" [ngClass]="{cursorPointer: !wrenchModeTrain}" (click)="faucetCtrlFctPlus()"> 
 											<i class="fa fa-undo" aria-hidden="true"></i>
 											<div class="wheelsmall"> </div>
 										</div>
@@ -72,14 +72,14 @@
 									</div>
 								</div>
 								<div class="buttonletterChar">
-									<div class="pushButton" [ngClass]="{'cursorPointer': !wrenchModeTrain}" (click)="waterPushButton()">
+									<div class="pushButton" [ngClass]="{cursorPointer: !wrenchModeTrain}" (click)="waterPushButton()">
 										<div class="buttonTap">
 										</div>
 									</div>
 									<div class="char"> e </div>
 								</div>
 								<div class="buttonletterChar">
-									<div class="wrenchButton" [ngClass]="{'cursorPointer': !wrenchModeTrain}" (click)="wrenchOnOff()">
+									<div class="wrenchButton" [ngClass]="{cursorPointer: !wrenchModeTrain}" (click)="wrenchOnOff()">
 										<i class="fa fa-wrench" aria-hidden="true"></i>
 									</div>
 									<div class="char"> a </div>

@@ -1,0 +1,28 @@
+@import '~font-awesome/css/font-awesome.css';
+
+.pageAbout{
+	width: 2000px;
+    height: 2625px;
+    display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+	font-family: 'Montserrat', sans-serif;
+	background-color: #373737;
+}
+
+
+.poster{
+	height: 100%;
+	width: 1821px;
+	background-size: 1821px auto;
+	background-image: url("/assets/images/poster.png");
+}
+
+.gohomeTrain{
+    margin-top: 1vw;
+    margin-bottom: 1vw;
+	font-size: 2vw;
+	color: #05BDFF;
+	cursor: pointer;
+}

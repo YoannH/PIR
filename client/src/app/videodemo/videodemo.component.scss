@@ -1,0 +1,20 @@
+@import '~font-awesome/css/font-awesome.css';
+
+.videodemo{
+	height: 97vh;
+	font-size: 1vw;
+	display: flex;
+	flex-direction: column; 
+	justify-content: space-around;
+	align-items: center;
+	background-color: #373737;
+	color: white;
+	font-family: 'Montserrat', sans-serif;
+}
+
+.gohomeTrain{
+	margin-top: 2vw;
+	font-size: 2vw;
+	color: #05BDFF;
+	cursor: pointer;
+}

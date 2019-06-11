@@ -5,6 +5,8 @@ import { AuthGuard } from './services/auth-guard.service';
 import { HowtoComponent } from './howto/howto.component';
 import { TrainComponent } from './train/train.component';
 import { ScoresComponent } from './scores/scores.component';
+import { VideodemoComponent } from './videodemo/videodemo.component';
+import { AboutComponent } from './about/about.component';
 
 const routes: Routes = [
   { path: '', component : WelcomeComponent },
@@ -12,6 +14,8 @@ const routes: Routes = [
   { path: 'howto', canActivate : [AuthGuard], component : HowtoComponent },
   { path: 'train', canActivate : [AuthGuard], component : TrainComponent },
   { path: 'scores', canActivate : [AuthGuard], component : ScoresComponent },
+  { path: 'videodemo', canActivate : [AuthGuard], component : VideodemoComponent},
+  { path: 'about', canActivate : [AuthGuard], component : AboutComponent},
   { path: '**', component : WelcomeComponent }
 ];
 

@@ -1,0 +1,7 @@
+<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"> 
+<div class="videodemo">
+
+
+<iframe width="60%" height="70%" src="https://www.youtube.com/embed/3qftdIPUaAE?rel=0&amp;showinfo=1&amp;autoplay=1&amp;cc_load_policy=1&amp;controls=1&amp;mute=1" frameborder="0" allowfullscreen></iframe>
+<div [routerLink]="['/welcome']" class="gohomeTrain" *ngIf="language=='english'"> <i class="fa fa-reply" aria-hidden="true"></i> back to main menu </div>
+<div [routerLink]="['/welcome']" class="gohomeTrain" *ngIf="language=='french'"> <i class="fa fa-reply" aria-hidden="true"></i> retour au menu principal </div>

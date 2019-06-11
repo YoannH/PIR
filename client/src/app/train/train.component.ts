@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HotkeysService, Hotkey } from 'angular2-hotkeys';
 import { Subscription } from 'rxjs/Subscription';
 import { GlobalDatasService } from '../services/global-datas.service';
@@ -9,7 +9,7 @@ import { interval } from 'rxjs/observable/interval';
   templateUrl: './train.component.html',
   styleUrls: ['./train.component.scss']
 })
-export class TrainComponent implements OnInit {
+export class TrainComponent implements OnInit, OnDestroy {
 
 
 
@@ -127,7 +127,7 @@ export class TrainComponent implements OnInit {
       } else if(this.xRobinet < 0) {
           this.xRobinet = 0;
       }
-      this.xRobinet += this.decal;
+      //this.xRobinet += this.decal;
       this.faucetXAxis = (this.xRobinet - 40) * 10 / 40;
       this.yRobinet = this.coeffXRob * Math.cos(this.faucetXAxis* this.piValue *2 / 20) + this.constXRob;
 
@@ -140,9 +140,13 @@ export class TrainComponent implements OnInit {
           leaksSum = leaksSum + 1;
         }
       }
-      if((this.faucetXAxis < 2) && (this.faucetXAxis > -2) && this.waterLevelContainer <= 100) {
-        this.waterLevelContainer += this.waterWidth*10/7 - leaksSum/(2*this.leakPlacesNb); 
-      } else if (this.waterLevelContainer > 100){
+      if(this.waterLevelContainer <= 100){
+        this.waterLevelContainer -= leaksSum/(2*this.leakPlacesNb);
+        if((this.faucetXAxis < 2) && (this.faucetXAxis > -2)){
+          this.waterLevelContainer += this.waterWidth*10/7;
+        }
+      }
+      else{
         this.waterLevelContainer -= leaksSum/this.leakPlacesNb;
       }
     });
