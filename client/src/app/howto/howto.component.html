@@ -1,0 +1,121 @@
+<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"> 
+<div class="howto"> 
+	<span class="titlehowto" *ngIf="language=='english'"> Context: </span> 
+	<span class="titlehowto" *ngIf="language=='french'"> Contexte: </span> 
+	<div class="rowhowto">
+		<div class="leftpartrow">
+			<i class="fa fa-android" aria-hidden="true"></i>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='english'">
+			<span> A firefighter robot is present in a small area </span>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='french'">
+			<span> Un robot pompier se trouve dans une petite zone </span>
+		</div>
+	</div>
+	<div class="rowhowto">
+		<div class="leftpartrow">
+			<i class="fa fa-tree" aria-hidden="true"></i>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='english'">
+			<span>  with few trees  </span>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='french'">
+			<span>  avec quelques arbres  </span>
+		</div>
+	</div>
+	<div class="rowhowto">
+		<div class="leftpartrow">
+			<i class="fa fa-fire" aria-hidden="true"></i>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='english'">
+			<span>  which have a weird tendency to self-ignite for some unknown reason... </span>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='french'">
+			<span>  ayant une facheuse tendance à prendre feu pour une raison inconnue... </span>
+		</div>
+	</div>
+	<div class="rowhowto">
+		<div class="leftpartrow">
+			<i class="fa fa-location-arrow" aria-hidden="true"></i>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='english'">
+			<span> Through your graphical interface, you get the position of the robot, </span>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='french'">
+			<span> Grâce à l'interface graphique, vous observez la position du robot, </span>
+		</div>
+	</div>
+	<div class="rowhowto">
+		<div class="leftpartrow">
+			<i class="fa fa-video-camera" aria-hidden="true"></i>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='english'">
+			<span> as well as the video from its camera. </span>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='french'">
+			<span> ainsi que la vidéo générée par sa caméra. </span>
+		</div>
+	</div>
+	<div class="rowhowto">
+		<div class="leftpartrow">
+			<i class="fa fa-battery-three-quarters" aria-hidden="true"></i>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='english'">
+			<span> The battery charge level of the robot decreases with time: when the robot is on the red square, the battery recharges. </span> 
+		</div>
+		<div class="rightpartrow" *ngIf="language=='french'">
+			<span> Le niveau de baterie du robot diminue avec le temps : lorsque le robot est sur le carré rouge, la baterie se recharge. </span> 
+		</div>
+	</div>
+	<div class="rowhowto">
+		<div class="leftpartrow">
+			<i class="fa fa-tint" aria-hidden="true"></i>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='english'">
+			<span> The volume of water contained by the robot is not unlimited: to recharge its water tank, the robot has to be placed on the blue square and the ground tank has to be full enough. For that, you have to fill the ground tank using the buttons on the left-side of the interface. </span>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='french'">
+			<span> Le volume d'eau contenu par le robot n'est pas illimité : pour le recharger en eau, le robot doit être placé sur le carré bleu et le réservoir principal doit être assez rempli. Pour cela, vous devez remplir le réservoir principal en utilisant les boutons à gauche de l'interface. </span>
+		</div>
+	</div>
+	<span class="titlehowto" *ngIf="language=='english'"> Goal: </span>
+	<span class="titlehowto" *ngIf="language=='french'"> But: </span>
+	<div class="rowhowto">
+		<div class="leftpartrow">
+			<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='english'">
+			<span> With the help of this robot, your mission is to fight as much fires as you can. </span>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='french'">
+			<span> Avec l'aide de ce robot, votre mission est d'éteindre le plus de feux possible. </span>
+		</div>
+	</div>
+	<div class="rowhowto">
+		<div class="leftpartrow">
+			<i class="fa fa-play" aria-hidden="true"></i>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='english'">
+		<span> The robot can become autonomous at any time. </span>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='french'">
+		<span> Le robot peut devenir autonome à n'importe quel moment. </span>
+		</div>
+	</div>
+
+	<div class="rowhowto">
+		<div class="leftpartrow">
+			<i class="fa fa-thermometer-three-quarters" aria-hidden="true"></i>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='english'">
+		<span> Pay attention to the robot's temperature when it is too close of flames!  </span>
+		</div>
+		<div class="rightpartrow" *ngIf="language=='french'">
+		<span> Faites attention à la température du robot lorsqu'il est trop proche des flammes !</span>
+		</div>
+	</div>
+	<div [routerLink]="['/welcome']" class="gohomeTrain" *ngIf="language=='english'"> <i class="fa fa-reply" aria-hidden="true"></i> back to main menu </div>
+	<div [routerLink]="['/welcome']" class="gohomeTrain" *ngIf="language=='french'"> <i class="fa fa-reply" aria-hidden="true"></i> retour au menu principal</div>
+<!--	<button ui-sref="welcome"> BACK </button> -->
+</div>

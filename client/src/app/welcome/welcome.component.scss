@@ -1,0 +1,211 @@
+@import '~font-awesome/css/font-awesome.css';
+  
+/**
+ *Font Awesome Fonts
+ */
+
+
+.page{
+	height: 97vh;
+	font-size: 0.8vw;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+/*	background-color: #bbbdf6;*/
+	background-color: #373737;
+	color: white;
+	font-family: 'Montserrat', sans-serif;
+	
+}
+
+.mainmsgs{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+/*	border-bottom: solid 1vh;*/
+}
+
+.mainmsgsrules{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	border-bottom: solid 1vh;
+	border-top: solid 1vh;
+	padding: 1vw;
+}
+
+.mainmsg{
+	font-size: 250%;
+	display: flex;
+	align-items: flex-end;
+}
+
+.mainBand{
+	width: 100%;
+	display: flex;
+	justify-content: space-around;
+	height: 15%;
+/*	background-color: yellow;*/
+}
+
+.mainButton{
+	font-size: 250%;
+/*	background-color: #9893da;*/
+	background-color: #05BDFF;
+	padding: 2%;
+	border-radius: 0.5vw;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	cursor: pointer;
+	color: white;
+}
+
+
+.logos{
+	width: 100%;
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	height: 15%;
+	background-color: #05BDFF;
+}
+
+.logosclose{
+	width: 50%;
+	display: flex;
+	justify-content: space-around;
+}
+
+.dassault{
+	background-image: url("/assets/images/whitelogo.png");
+	/*
+	width: 16.45vw;
+	height: 10vw;*/
+/*	width: 11.515vw;
+	height: 7vw;*/
+/*
+	width: 7.6767vw;
+	height: 4.667vw;*/
+	width: 9.31204vw;
+	height: 5.6004vw;
+	background-size: cover;
+}
+
+.supaero{
+	background-image: url("/assets/images/dassault-white.png");
+/*	width: 30.8vw;
+	height: 10vw;*/
+/*
+	width: 14.37436vw;
+	height: 4.667vw;*/
+	width: 17.349232vw;
+	height: 5.6004vw;
+	background-size: cover;
+}
+
+.thanks{
+	font-size: 0.8vw;
+	width: 99vw;
+}
+.allThanks{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	
+}
+
+.timeBeforePlaying{
+	font-size: 200%;
+	padding: 2%;
+	border: solid #333 0.3vw;
+	border-radius: 0.5vw;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 27vw;
+}
+
+
+
+.bold{
+	font-weight: bold;
+}
+
+.tapwater{
+	background-image: url("/assets/images/tapwater.png");
+	width: 3vw;
+	height: 3vw;
+	background-size: 3vw 3vw;
+	margin-left: 0.5vw;
+}
+
+.mainmsgsrules .brain{
+	background-image: url("/assets/images/robot_face.png");
+	margin-left: 1vw;
+	width: 2.5vw;
+	height: 2.5vw;
+	background-size: 2.5vw 2.5vw;
+}
+
+
+.mainmsgsrules .fireicon{
+	background-image: url("/assets/images/fire.png");
+	margin-left: 1vw;
+	margin-right: 1vw;
+	width: 2.5vw;
+	height: 2.5vw;
+	background-size: 2.5vw 2.5vw;
+}
+
+.mainmsgsrules .keyboard{
+	background-image: url("/assets/images/controller.png");
+	margin-left: 1vw;
+	margin-right: 1vw;
+	width: 2.5vw;
+	height: 2.5vw;
+	background-size: 2.5vw 2.5vw;
+}
+
+.titleWelcome{
+	font-size: 2.5vw;
+}
+
+
+.languages{
+	height: 90%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+}
+
+.language{
+	color: white;
+	border: solid white 0.2vw;
+	border-radius: 0.5vw;
+	font-size: 1.5vw;
+	padding: 0.3vw;
+	cursor: pointer;
+}
+
+.notegame{
+  width: 70%;
+  text-align: center;
+  font-size : 1.3vw;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+
+  
+
+  
+
+  

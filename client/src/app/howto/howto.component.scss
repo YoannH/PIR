@@ -1,0 +1,40 @@
+@import '~font-awesome/css/font-awesome.css';
+
+
+.howto{
+	height: 97vh;
+	font-size: 2vw;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+	font-family: 'Montserrat', sans-serif;
+	background-color: #373737;
+	color: white;
+}
+
+.titlehowto{
+	font-weight: bold;
+	color: #05BDFF;
+}
+
+.rowhowto{
+	width: 100%;
+	display: flex;
+	justify-content: space-around;
+}
+
+.rightpartrow{
+	width: 90%;
+}
+
+.howto i{
+	color: #05BDFF;
+}
+
+.gohomeTrain{
+	margin-top: 2vw;
+	font-size: 2vw;
+	color: #05BDFF;
+	cursor: pointer;
+}

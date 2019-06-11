@@ -1,0 +1,75 @@
+<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"> 
+<div class="page">
+	<div class="mainmsgs">
+		<div class="titleWelcome" *ngIf="language=='english'"> Welcome to the HoRIzON webpage </div>
+		<div class="titleWelcome" *ngIf="language=='english'"> hosting the <span class="bold"> FIREFIGHTER ROBOT GAME </span> </div>
+		<div class="titleWelcome" *ngIf="language=='french'"> Bienvenue sur la page web du projet HoRIzon</div>
+		<div class="titleWelcome" *ngIf="language=='french'"> le <span class="bold"> JEU DU ROBOT POMPIER </span> vous attend ! </div>
+	</div>
+	<div class="mainmsgsrules">
+		<div class="mainmsg" *ngIf="language=='english'"> <span> Try to fight fires </span> <div class="fireicon"> </div> <span> with a ground robot </span> <div class="brain"> </div> </div>
+		<div class="mainmsg" *ngIf="language=='english'"> <span> by controlling it </span> <div class="keyboard"> </div> <span> when it loses its autonomy </span> </div>
+		<div class="mainmsg" *ngIf="language=='english'"> <span> and by managing its water tank </span> <div class="tapwater"> </div>  </div>
+		<div class="mainmsg" *ngIf="language=='english'"> <div> <i class="fa fa-wifi" aria-hidden="true"></i> </div> <span> &nbsp; You need a good internet connection! </span> </div>
+		<div class="mainmsg" *ngIf="language=='french'"> <span> Essayez d'éteindre les feux </span> <div class="fireicon"> </div> <span> avec un robot terrestre </span> <div class="brain"> </div> </div>
+		<div class="mainmsg" *ngIf="language=='french'"> <span> en le controlant </span> <div class="keyboard"> </div> <span> lorsqu'il perd son autonomie </span> </div>
+		<div class="mainmsg" *ngIf="language=='french'"> <span> et en gérant ses réserves d'eau </span> <div class="tapwater"> </div>  </div>
+		<div class="mainmsg" *ngIf="language=='french'"> <div> <i class="fa fa-wifi" aria-hidden="true"></i> </div> <span> &nbsp; Vous avez besoin d'une bonne connection internet ! </span> </div> 
+	</div>
+	<div class="mainBand">
+
+    <div class="mainButton" [routerLink]="['/howto']" *ngIf="language=='english'"> RULES </div>
+    <div class="mainButton" [routerLink]="['/howto']" *ngIf="language=='french'"> REGLES </div>
+
+	  <div class="mainButton" [routerLink]="['/train']" *ngIf="language=='english'"> TRAIN </div>
+		<div class="mainButton" [routerLink]="['/train']" *ngIf="language=='french'"> ENTRAINEMENT </div>	
+		
+		<div class="mainButton" [routerLink]="['/loading']" (click)="play()" *ngIf="emptySlot && language=='english'"> PLAY </div>
+    <div class="mainButton" [routerLink]="['/loading']" (click)="play()" *ngIf="emptySlot && language=='french'"> JOUER </div>
+  
+    <div class="timeBeforePlaying" *ngIf="!emptySlot"> 
+			<span class="notegame" *ngIf="language=='english'"> Someone is playing: the game will be available in {{remainingtime || "few"}} seconds. </span>
+			<span class="notegame" *ngIf="language=='french'"> Quelqu'un joue actuellement : le jeu sera disponible dans {{remainingtime || "few"}} secondes. </span> 
+		</div>
+<!--		<div class="mainButton" ui-sref="game" *ngIf="!emptySlot"> SEE </div> -->		
+    
+    <div [routerLink]="['/scores']" class="mainButton"> SCORES </div>
+    		
+		<div class="mainButton" [routerLink]="['/about']" *ngIf="language=='english'"> ABOUT </div>
+    <div class="mainButton" [routerLink]="['/about']" *ngIf="language=='french'"> A PROPOS </div>
+    
+	</div>
+	<div class="notegame" *ngIf="language=='english'"> This crowdsourcing platform has been developped by the department
+<a style="color: #05BDFF" href="https://www.isae-supaero.fr/en/research/departments/department-of-aerospace-vehicles-design-and-control-dcas-95/department-of-aerospace-vehicles-design-and-control-dcas/">DCAS</a>
+ of <a style="color: #05BDFF" href="https://www.isae-supaero.fr/en/">ISAE-SUPAERO</a> in the context of the     <a style="color: #05BDFF" href="https://www.isae-supaero.fr/en/isae-supaero/mecenat-relations-avec-la-fondation-isae-supaero/chaire-dassault-aviation/">Dassault Aviation chair</a>. </div>
+	<div class="notegame" *ngIf="language=='french'"> Cette plate-forme de collecte de données participative a été développée par le département 
+<a style="color: #05BDFF" href="https://www.isae-supaero.fr/en/research/departments/department-of-aerospace-vehicles-design-and-control-dcas-95/department-of-aerospace-vehicles-design-and-control-dcas/">DCAS</a>
+ de l'<a style="color: #05BDFF" href="https://www.isae-supaero.fr/en/">ISAE-SUPAERO</a> dans le contexte de la <a style="color: #05BDFF" href="https://www.isae-supaero.fr/en/isae-supaero/mecenat-relations-avec-la-fondation-isae-supaero/chaire-dassault-aviation/">chaire Dassault Aviation</a>. </div>
+	<div class="logos">
+		<div class="languages">
+			<div class="language" (click)="changeLanguage('french')"> <span class="bold"> FRANCAIS </span> </div>
+			<div class="language" (click)="changeLanguage('english')"><span class="bold"> ENGLISH </span> </div>
+		</div>
+		<div class="logosclose"> 
+			<div class="dassault"> </div>   <!-- ui-sref="experiment" --> 
+			<div class="supaero"> </div> 
+		</div>
+	</div>
+	<div class="allThanks">
+		<div class="thanks" *ngIf="language=='english'"> 
+			By <span class="bold"> Nicolas Drougard</span>. 
+			Many thanks to Corentin Chauffaut and Pascal Chauvin for the robotic framework, 
+			to Christophe Garcia for the web hosting (firstname.name@isae-supaero.fr), 
+			and to Mario Cassaro for the water management task design (firstname.name@onera.fr). 
+			Also many thanks to Jonathan Carbasse for his great help with angular fullstack (firstname.name@gmail.com). 
+			Thanks to EmojiOne for providing free emoji icons. Font Awesome by Dave Gandy - http://fontawesome.io 
+		</div> 
+		<div class="thanks" *ngIf="language=='french'"> 
+			Par <span class="bold"> Nicolas Drougard</span>. 
+			Un grand merci à Corentin Chauffaut et Pascal Chauvin pour la partie robotique, 
+			à Christophe Garcia pour l'hébergement web (prenom.nom@isae-supaero.fr), 
+			et à Mario Cassaro pour le module de gestion de l'eau (prenom.nom@onera.fr). 
+			Un grand merci aussi à Jonathan Carbasse pour son aide précieuse avec angular fullstack (prenom.nom@gmail.com). 
+			Merci à EmojiOne pour les emojis. Font Awesome par Dave Gandy - http://fontawesome.io
+		</div>
+</div>
