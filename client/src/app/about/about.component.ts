@@ -1,13 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { GlobalDatasService } from '../services/global-datas.service';
+import { GlobalDatasService } from './../services/global-datas.service';
 import { Subscription } from 'rxjs/Subscription';
 
 @Component({
-  selector: 'app-howto',
-  templateUrl: './howto.component.html',
-  styleUrls: ['./howto.component.scss']
+  selector: 'app-about',
+  templateUrl: './about.component.html',
+  styleUrls: ['./about.component.scss']
 })
-export class HowtoComponent implements OnInit, OnDestroy {
+export class AboutComponent implements OnInit, OnDestroy {
 
   language : string ;
   languageSubscription : Subscription;

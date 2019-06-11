@@ -38,7 +38,7 @@
 								<div class="tankcontainerleakspart">
 									<div class="wrapLeaks">
 									<div class="leakContainer" *ngFor="let value of leakPlaces, let key = index">
-										<div class="leak" [ngClass]="{nonvisible: noLeakAt[key]}" [ngStyle]="{'transform': 'scale(' + leaksReverse[key] + ', 1)', 'left': leftValues[key] + '%'}"  click="clickLeak(key)">
+										<div class="leak" [ngClass]="{nonvisible: noLeakAt[key]}" [ngStyle]="{'transform': 'scale(' + leaksReverse[key] + ', 1)', 'left': leftValues[key] + '%'}"  (click)="clickLeak(key)">
 										</div>
 									</div>
 								</div>

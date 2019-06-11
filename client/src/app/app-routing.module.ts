@@ -4,12 +4,16 @@ import { WelcomeComponent} from './welcome/welcome.component';
 import { AuthGuard } from './services/auth-guard.service';
 import { HowtoComponent } from './howto/howto.component';
 import { TrainComponent } from './train/train.component';
+import { VideodemoComponent } from './videodemo/videodemo.component';
+import { AboutComponent } from './about/about.component';
 
 const routes: Routes = [
   { path: '', component : WelcomeComponent },
   { path: 'welcome', component : WelcomeComponent },
   { path: 'howto', canActivate : [AuthGuard], component : HowtoComponent },
   { path: 'train', canActivate : [AuthGuard], component : TrainComponent },
+  { path: 'videodemo', canActivate : [AuthGuard], component : VideodemoComponent},
+  { path: 'about', canActivate : [AuthGuard], component : AboutComponent},
   { path: '**', component : WelcomeComponent }
 ];
 

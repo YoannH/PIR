@@ -11,6 +11,8 @@ import { HowtoComponent } from './howto/howto.component';
 import { TrainComponent } from './train/train.component';
 import { HotkeysService, HotkeyModule } from 'angular2-hotkeys';
 import { MainComponent } from './main/main.component';
+import { VideodemoComponent } from './videodemo/videodemo.component';
+import { AboutComponent } from './about/about.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +21,9 @@ import { MainComponent } from './main/main.component';
     FooterComponent,
     HowtoComponent,
     TrainComponent,
-    MainComponent
+    MainComponent,
+    VideodemoComponent,
+    AboutComponent
   ],
   imports: [
     BrowserModule,
