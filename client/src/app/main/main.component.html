@@ -1,3 +1,255 @@
-<p>
-  main works!
-</p>
+<div class="screen" [ngClass]="{screenWrench: wrenchMode}" >
+	<!-- <div [ngClass]="{overlayOpen: overlayOpen}" class="overlay">
+		<div class="gameover" *ngIf="cause==1 || cause==2"> GAME OVER! </div>
+                <div class="gameover" *ngIf="cause==0"> THE END </div>
+                <div class="textthx" *ngIf="cause==0"> Mission completed, CONGRATULATION! </div>
+		<div class="whyover" *ngIf="cause==1"> 
+			<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> 
+			<div class="textcause"> Battery empty </div> 
+			<i class="fa fa-battery-empty" aria-hidden="true"></i> 
+		</div>
+		<div class="whyover" *ngIf="cause==2"> 
+			<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> 
+			<div class="textcause"> Overheat </div> 
+			<i class="fa fa-thermometer-full" aria-hidden="true"></i> 
+		</div>
+		<div class="numextfires"> 
+			<div class="fireicon"> </div> 
+			<span> {{finalnumfires}} extinguished fires </span> 
+			<i class="fa fa-thumbs-o-up" aria-hidden="true"></i> 
+		</div>
+		<div class="newbestscore" *ngIf="newBestScore"> 
+			<span> NEW BEST SCORE! Good job </span> <span style="color: #05BDFF">&nbsp;{{winnerPseudo}}</span> <span>!</span>
+		</div>
+		<div (click)="gohome()" ui-sref="welcome" class="gohome"> 
+			<i class="fa fa-reply" aria-hidden="true"></i> 
+			<span> back to main menu </span> 
+		</div>
+	</div>  -->
+
+
+	<div [ngClass]="{overlayOpen: alarmOverlayOpen}" class="alarmOverlay">
+		<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> 
+		<span class="textAlarm"> {{alarmText[alarmCause]}} ! </span>
+		<div class="alarmButton" (click)="removeAlarm()"> I got it </div>	
+	</div>
+
+	<div class="leftPart">  
+		<div class="missionBlock">
+			<div class="maincontainermission">
+				<div class="iconCircle">
+					<i class="fa fa-trophy" aria-hidden="true"></i>
+				</div>
+				<div class="gametitle">
+					Firefighter Human-Robot Team <div class="fireicon"> </div>
+				</div>
+				<div class="infonoff">	
+					<div class="missioninfo">
+						<div class="numbersinfo"> 
+							<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+							{{nbfighted}} 
+						</div> 
+						<div  class="numbersinfo"> <i class="fa fa-clock-o" aria-hidden="true"></i>   {{remainingtime}} </div>
+					</div>
+					<div class="onoff">						
+						<i (click)="killall()" class="fa fa-power-off" aria-hidden="true"></i>	
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="waterBlock"> 
+			<div class="maincontainer">
+				<div class="iconCircle">
+					<i class="fa fa-tint" aria-hidden="true"></i>
+				</div>
+	                        <div class="robinetcontainer">
+					<div class="robinet" [ngStyle]="{left: xRobinet+2+'%', bottom: yRobinet/1.8 + 42 +'%'}"> 
+					</div>
+					<div class="wheel" *ngIf="direction!=0" [ngClass]="{wheelinverse: direction<0}"  [ngStyle]="{left: xRobinet+7.9+'%', bottom: yRobinet/1.8+58+'%', 'animation-duration': animTime + 's'}"> 
+					</div>
+					<div class="wheel" *ngIf="direction==0" [ngStyle]="{left: xRobinet+7.9+'%', bottom: yRobinet/1.8+58+'%'}"> 
+					</div>
+					<div class="string" [ngStyle]="{left: xRobinet+11.5+'%', bottom: yRobinet/1.8+52+'%'}"> 
+					</div>
+					<div class="robinetwaterContainer" [ngStyle]="{left: xRobinetWater -0.6+'%', bottom: yRobinet/1.8 + 37 +'%'}">
+						<div class="robinetwater" [ngStyle]="{width: waterWidth + 'vw', 'background-size': waterWidth + 'vw 1vw'}">
+						
+						</div>
+					</div>
+					<div class="montainAxis"> 
+					</div>
+					<div class="neckcontainer">
+					</div>
+					<div class="tankcontainer">	
+						<div class="tankcontainerwaterpart">
+							<div class="tankcontainerwaterviz">
+								<div class="graduations"> </div>
+								<div class="tankcontainerwater" [ngStyle]="{height: waterLevelContainer + '%'}"> 
+								</div>
+							</div>
+						</div>    
+						<div class="tankcontainerleakspart">
+
+							<div class="wrapLeaks">
+								<div class="leakContainer" *ngFor="let value of leakPlaces; let key = index">
+									<div class="leak" [ngClass]="{nonvisible: noLeakAt[key]}" [ngStyle]="{'transform': 'scale(' + leaksReverse[key] + ', 1)', 'left': leftValues[key] + '%'}"  (click)="clickLeak(key)">
+									</div>
+								</div>
+							</div>
+
+						</div>
+						<div class="legsContainer">
+							<div class="legs">
+							</div>                           	
+						</div>
+					</div>
+
+					<div class="wmbuttons">
+						<div class="speed">  
+							<div class="wheelsmall2"> </div>
+							<div *ngIf="language=='english'"> speed: {{faucetControl}} </div>
+							<div *ngIf="language=='french'"> vitesse: {{faucetControl}} </div>
+						</div>
+						<div class="buttonWheel">
+							<div class="buttonChar">
+								<div class="mainbuttonL" [ngClass]="{cursorPointer: !wrenchMode}" (click)="faucetCtrlFctMinus()"> 
+									<div class="undo"> <i class="fa fa-undo" aria-hidden="true"></i></div>
+									<div class="wheelsmall"> </div>
+								</div>
+								<div class="char"> s </div>
+							</div>
+							<div class="buttonletterChar">
+								<div class="mainbuttonR" [ngClass]="{cursorPointer: !wrenchMode}" (click)="faucetCtrlFctPlus()"> 
+									<div class="undo">  <i class="fa fa-undo" aria-hidden="true"></i> </div>
+									<div class="wheelsmall"> </div>
+								</div>
+								<div class="char"> d </div>
+							</div>
+						</div>
+						<div class="buttonletterChar">
+							<div class="pushButton" [ngClass]="{cursorPointer: !wrenchMode}" (click)="waterPushButton()">
+								<div class="buttonTap">
+								</div>
+							</div>
+							<div class="char"> e </div>
+						</div>
+						<div class="buttonletterChar">
+							<div class="wrenchButton" [ngClass]="{cursorPointer: !wrenchMode}" (click)="wrenchOnOff()">
+								<i class="fa fa-wrench" aria-hidden="true"></i>
+							</div>
+							<div class="char"> a </div>
+						</div>
+					</div>
+				</div>				
+			</div>
+		</div>
+	</div>
+	<div class="rightPart"> 
+		<div class="videoBlock"> 
+			<div class="maincontainercam">
+				<div class="streamcamera">
+					<!-- <img class="imagecam" ng-src={{addressUpdated}} scrolling="no" frameBorder="0"> -->
+					<div class="splatchContainer">
+				        	<div class="splatch" [ngClass]="{visiblesplatch: waterize}">
+				        	</div>
+					</div>
+					<div class="redhotContainer">
+				        	<div class="redhot" [ngStyle]="{opacity: hotScreen}">
+				        	</div>
+					</div>
+				</div>
+			</div>		
+		</div>
+		<div class="infoBlock"> 
+			<div class="maincontainer">
+				<div class="iconCircle">
+					<i class="fa fa-info" aria-hidden="true"></i>
+				</div>
+				<div class="iconscontents">
+					<div class="linktoicon">
+						<i class="fa fa-globe" aria-hidden="true"></i>
+					</div>
+					<div class="maincontainersec">
+						<div class="mapblock">
+							<div class="map">
+								<div class="point" [ngStyle]="{top: propFromTop, left: propFromLeft, transform: 'rotate('+ rotInDeg +'deg)'}">
+								</div>
+								<div class="tree" *ngFor="let value of trees; let key = index" [ngStyle]="{top: value.y, left: value.x}">
+								</div>
+								<div class="fire" *ngFor="let value of firesloc; let key = index" [ngStyle]="{top: value.y, left: value.x, opacity: opacityFire[key]}">
+								</div>
+								<div class="loadlocB" [ngStyle]="{top: zones[1].y, left: zones[1].x}">
+									<i class="fa fa-bolt" aria-hidden="true"></i>					
+								</div>
+								<div class="loadlocW" [ngStyle]="{top: zones[0].y, left: zones[0].x}">
+									<div>
+										<i class="fa fa-tint" aria-hidden="true"></i>
+									</div>						
+									<div class="waterlevelmap" [ngStyle]="{height: waterLevelContainerMap + 'px'}">
+									</div>				
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="iconscontents2">
+					<div class="linktoicon">
+						<div class="robothead">
+						</div>
+					</div>
+					<div class="maincontainersec2">
+						<div class="warningsblock">
+							<div class="robtoppart">
+								<div class="autonomy">
+									<div class="brain" *ngIf="autonomous"> </div>
+									<div class="keyboard" *ngIf="!autonomous"> </div>
+									<span *ngIf="autonomous && language=='english'"> AUTONOMOUS </span>
+									<span *ngIf="!autonomous && language=='english'"> MANUAL </span>
+									<span *ngIf="autonomous && language=='french'"> AUTONOME </span>
+									<span *ngIf="!autonomous && language=='french'"> MANUEL </span>  			
+								</div>
+								<div class="batTemp">
+									<div class="connectbat">
+										<div class="battery">
+											<div class="batlev"  [ngStyle]="{width: battLevel+'%'}">
+											</div>
+										</div>
+										<div class="batconnect">
+										</div>
+									</div>
+									<div class="therm">
+										<div class="temperature">
+											<div class="cercle">
+												<div class="bluecercle">
+												</div>								
+											</div>
+											<div class="someRed">
+											</div>
+											<div class="thermometer">
+												<div class="mercure" [ngStyle]="{height: mercureLevel}"> 	
+												</div>	
+											</div>								
+										</div>	
+									</div>
+
+								</div>
+								
+							</div>
+							<div class="robotwaterres">
+								<div class="littlesplatchwhite">
+								</div>
+								<div class="waterlevelbar">
+									<div class="waterlevelcont">
+										<div class="waterlevel" [ngStyle]="{width: watLevel +'%'}">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>

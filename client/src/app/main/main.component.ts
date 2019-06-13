@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { GlobalDatasService } from '../services/global-datas.service';
+import { Router } from '@angular/router';
+import { SocketService } from '../services/socket-service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-main',

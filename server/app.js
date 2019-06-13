@@ -48,8 +48,9 @@ io.on('connection', (socket) => {
 				//les 2 joueurs sont connectés dans l'écran de chargement
 				if(socketsArray[player1].socket.connected){
 					//on renseigne les autres connectés que le serveur est occupé
+					remainingTime = gameTime + waitingTime;
 					socketsArray.forEach((element) => {
-						if(element.status !== 'logged'){
+						if(element.status == 'connected'){
 							element.socket.emit("remainingTimeResponse", {remainingTime : remainingTime});
 						}
 					});
@@ -62,7 +63,7 @@ io.on('connection', (socket) => {
 					player1Ready = false;
 					player2Ready = false;
 					waitingTime = 15;
-					remainingTime = gameTime + waitingTime;
+					
 					nbReadyPlayers = 0;
 					//on lance un timer de 15 secondes : les joueurs doivent cliquer sur un bouton
 					//avant la fin pour lancer la partie, ceux qui ne le font pas sont redirigés 
@@ -107,7 +108,7 @@ io.on('connection', (socket) => {
 								remainingTime = 0;
 
 								socketsArray.forEach((element) => {
-									if(element.status !== 'logged'){
+									if(element.status === 'connected'){
 										element.socket.emit("remainingTimeResponse", {remainingTime : remainingTime});
 									}
 								});
@@ -137,12 +138,13 @@ io.on('connection', (socket) => {
 			playerNumber = 2;
 		}
 		if(gameWillSoonStart && (playerNumber != 0)){
-			nbReadyPlayers += 1 ;
-			if(playerNumber === 1){
+			if(playerNumber === 1 && !player1Ready){
 				player1Ready = true;
+				nbReadyPlayers +=1;
 			}
-			else{
+			else if(!player2Ready){
 				player2Ready = true;
+				nbReadyPlayers +=1;
 			}
 		}else{
 			socket.emit("launchFailed", {waitingAgain : false});

@@ -8,6 +8,7 @@ import { ScoresComponent } from './scores/scores.component';
 import { VideodemoComponent } from './videodemo/videodemo.component';
 import { AboutComponent } from './about/about.component';
 import { LoadingComponent } from './loading/loading.component';
+import { MainComponent } from './main/main.component';
 
 const routes: Routes = [
   { path: '', component : WelcomeComponent },
@@ -18,6 +19,7 @@ const routes: Routes = [
   { path: 'videodemo', canActivate : [AuthGuard], component : VideodemoComponent},
   { path: 'about', canActivate : [AuthGuard], component : AboutComponent},
   { path: 'loading', canActivate : [AuthGuard], component : LoadingComponent},
+  { path: 'main', canActivate : [AuthGuard], component : MainComponent },
   { path: '**', component : WelcomeComponent }
 ];
 
