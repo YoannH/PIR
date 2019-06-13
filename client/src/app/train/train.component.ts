@@ -52,7 +52,7 @@ export class TrainComponent implements OnInit, OnDestroy {
    waterFlowSubscriber : Subscription;
    leaksSubscriber : Subscription;
 
-   constructor(private globalDatasService : GlobalDatasService, hotkeysService : HotkeysService) {
+   constructor(private globalDatasService : GlobalDatasService, private hotkeysService : HotkeysService) {
    
     //hotkeys
    
@@ -63,28 +63,28 @@ export class TrainComponent implements OnInit, OnDestroy {
     // undefined,
     // 'description ));
 
-    hotkeysService.add( new Hotkey( 's', (event : KeyboardEvent) : boolean => {
+    this.hotkeysService.add( new Hotkey( 's', (event : KeyboardEvent) : boolean => {
       this.faucetCtrlFctMinus();
       return false;
     },
     undefined,
     'tapleft' ));
 
-    hotkeysService.add( new Hotkey( 'd', (event : KeyboardEvent) : boolean => {
+    this.hotkeysService.add( new Hotkey( 'd', (event : KeyboardEvent) : boolean => {
       this.faucetCtrlFctPlus();
       return false;
     },
     undefined,
     'tapright' ));
 
-    hotkeysService.add( new Hotkey( 'e', (event : KeyboardEvent) : boolean => {
+    this.hotkeysService.add( new Hotkey( 'e', (event : KeyboardEvent) : boolean => {
       this.waterPushButton();
       return false;
     },
     undefined,
     'pushbutton' ));
 
-    hotkeysService.add( new Hotkey( 'a', (event : KeyboardEvent) : boolean => {
+    this.hotkeysService.add( new Hotkey( 'a', (event : KeyboardEvent) : boolean => {
       this.wrenchOnOff();
       return false;
     },
