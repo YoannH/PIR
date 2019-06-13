@@ -14,6 +14,8 @@ import { ScoresComponent } from './scores/scores.component';
 import { MainComponent } from './main/main.component';
 import { VideodemoComponent } from './videodemo/videodemo.component';
 import { AboutComponent } from './about/about.component';
+import { LoadingComponent } from './loading/loading.component';
+import { SocketService } from './services/socket-service';
 
 @NgModule({
   declarations: [
@@ -22,10 +24,11 @@ import { AboutComponent } from './about/about.component';
     FooterComponent,
     HowtoComponent,
     TrainComponent,
-    ScoresComponent
+    ScoresComponent,
     MainComponent,
     VideodemoComponent,
-    AboutComponent
+    AboutComponent,
+    LoadingComponent
   ],
   imports: [
     BrowserModule,
@@ -35,6 +38,7 @@ import { AboutComponent } from './about/about.component';
   providers: [
     GlobalDatasService,
     AuthGuard, 
+    SocketService,
     HotkeysService
   ],
   bootstrap: [AppComponent]

@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { Component, OnInit } from '@angular/core';
 import { GlobalDatasService} from './../services/global-datas.service';
 
 @Component({
@@ -7,25 +6,14 @@ import { GlobalDatasService} from './../services/global-datas.service';
   templateUrl: './videodemo.component.html',
   styleUrls: ['./videodemo.component.scss']
 })
-export class VideodemoComponent implements OnInit, OnDestroy {
+export class VideodemoComponent implements OnInit {
   
   language : string ;
-  languageSubscription : Subscription;
-
+  
   constructor(private globalDatasService : GlobalDatasService) {}
 
   ngOnInit() {
-    this.languageSubscription = this.globalDatasService.languageSubject.subscribe(
-      (language : string) => {
-        this.language = language;
-      }
-    );
-    this.globalDatasService.emitLanguageSubject();
-    this.globalDatasService.authentify();
-  }
-
-  ngOnDestroy() {
-    this.languageSubscription.unsubscribe();
+    this.language = this.globalDatasService.language;
   }
 
 }

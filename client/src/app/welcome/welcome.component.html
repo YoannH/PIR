@@ -24,12 +24,12 @@
 	  <div class="mainButton" [routerLink]="['/train']" *ngIf="language=='english'"> TRAIN </div>
 		<div class="mainButton" [routerLink]="['/train']" *ngIf="language=='french'"> ENTRAINEMENT </div>	
 		
-		<div class="mainButton" [routerLink]="['/loading']" (click)="play()" *ngIf="emptySlot && language=='english'"> PLAY </div>
-    <div class="mainButton" [routerLink]="['/loading']" (click)="play()" *ngIf="emptySlot && language=='french'"> JOUER </div>
+		<div class="mainButton" (click)="play()" *ngIf="emptySlot && language=='english'"> PLAY </div>
+    <div class="mainButton" (click)="play()" *ngIf="emptySlot && language=='french'"> JOUER </div>
   
     <div class="timeBeforePlaying" *ngIf="!emptySlot"> 
-			<span class="notegame" *ngIf="language=='english'"> Someone is playing: the game will be available in {{remainingtime || "few"}} seconds. </span>
-			<span class="notegame" *ngIf="language=='french'"> Quelqu'un joue actuellement : le jeu sera disponible dans {{remainingtime || "few"}} secondes. </span> 
+			<span class="notegame" *ngIf="language=='english'"> Someone is playing: the game will be available in {{remainingTime || "few"}} seconds. </span>
+			<span class="notegame" *ngIf="language=='french'"> Quelqu'un joue actuellement : le jeu sera disponible dans {{remainingTime || "few"}} secondes. </span> 
 		</div>
 <!--		<div class="mainButton" ui-sref="game" *ngIf="!emptySlot"> SEE </div> -->		
     
