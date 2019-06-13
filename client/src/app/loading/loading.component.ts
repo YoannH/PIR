@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { GlobalDatasService } from '../services/global-datas.service';
 import { Router } from '@angular/router';
 import { SocketService } from '../services/socket-service';
@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 })
 export class LoadingComponent implements OnInit, OnDestroy {
 
+  @Input() pseudo : string;
   anotherPlayer : boolean =false;
   language : string;
   waitingTime : number;
@@ -21,7 +22,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
   launchingGameSubscription : Subscription;
   timeBeforeStartSubscription : Subscription;
 
-  constructor(private globalDatasService : GlobalDatasService, private socketService : SocketService) { }
+  constructor(private globalDatasService : GlobalDatasService, private socketService : SocketService, private router : Router) { }
 
   ngOnInit() {
     this.language = this.globalDatasService.language;
@@ -31,13 +32,34 @@ export class LoadingComponent implements OnInit, OnDestroy {
     this.timeBeforeStartSubscription = this.socketService.onTimeBeforeStartResponse().subscribe((waitingTime) => {
         if(!this.anotherPlayer){
           this.anotherPlayer = true;
+          clearInterval(this.dotRepeater);
         }
         this.waitingTime = waitingTime;
+    });
+
+    this.launchingGameSubscription = this.socketService.onLaunchingGameResponse().subscribe(() => {
+        this.router.navigate(['/main']);
+    });
+
+    this.launchFailedSubscription = this.socketService.onLaunchFailedResponse().subscribe((waitingAgain) => {
+      if(waitingAgain){
+        this.anotherPlayer = false;
+        this.initDotTimer();
+      }else{
+        this.router.navigate(['/welcome']);
+      }
     });
   }
 
   ngOnDestroy() {
+    this.timeBeforeStartSubscription.unsubscribe();
+    this.launchFailedSubscription.unsubscribe();
+    this.launchingGameSubscription.unsubscribe();
+    clearInterval(this.dotRepeater);
+  }
 
+  ready(){
+    this.socketService.sendReady();
   }
 
   initDotTimer(){

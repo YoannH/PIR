@@ -30,6 +30,10 @@ export class SocketService {
         this.socket.emit("getPlay", { token : this.token });
     }
 
+    public sendReady() : void {
+        this.socket.emit("ready", { token : this.token });
+    }
+
     public onTokenResponse(): Observable<any>{
         return new Observable<any>( observer => {
             this.socket.on('tokenResponse' , (data) => {observer.next(data.token);

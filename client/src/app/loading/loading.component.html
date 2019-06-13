@@ -1,13 +1,14 @@
 <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"> 
 
 <div class="loading">
-	<div class="loadpart" *ngIf="!playEnabled && !lostGame">
+	<div class="loadpart" *ngIf="!anotherPlayer">
 		<span *ngIf="language=='english'"> WAITING FOR ANOTHER PLAYER <span *ngIf="dot>0">.</span><span *ngIf="dot>1">.</span><span *ngIf="dot>2">.</span></span>
 		<span *ngIf="language=='french'"> EN ATTENTE D'UN AUTRE JOUEUR <span *ngIf="dot>0">.</span><span *ngIf="dot>1">.</span><span *ngIf="dot>2">.</span></span>
 	</div>
-        <div class="loadpart2" *ngIf="playEnabled && !lostGame">
-		<span style="color: #05BDFF" *ngIf="user.pseudo!='' && language=='english'"> ANOTHER PLAYER HAS BEEN FOUND. THE GAME WILL START IN {{waitingTime}}S! </span>
-		<span style="color: #05BDFF" *ngIf="user.pseudo!='' && language=='french'"> UN AUTRE JOUEUR A ETE TROUVE. LE JEU COMMENCERA DANS  {{waitingTime}}S! </span>
+    <div class="loading" *ngIf="anotherPlayer">
+		<span style="color: #05BDFF" *ngIf="language=='english'"> ANOTHER PLAYER HAS BEEN FOUND. THE GAME WILL START IN {{waitingTime || 15}}S! </span>
+		<span style="color: #05BDFF" *ngIf="language=='french'"> UN AUTRE JOUEUR A ETE TROUVE. LE JEU COMMENCERA DANS  {{waitingTime || 15}}S! </span>
+		<div class="mainbutton" (click)="ready()">Clickez sur ce boutton pour jouer dans {{waitingTime}}S.</div>
 		<!-- <span *ngIf="language=='english'"> The game is ready! </span>
 		<span *ngIf="language=='french'"> Le jeu est prêt ! </span> -->
 	</div>
@@ -16,11 +17,11 @@
 		<span *ngIf="language=='french'"> TROP TARD, désolé ! </span>
 	</div> -->
 	<!-- <span class="advice"> Press F11 for a better experience </span> -->
-	<span class="advice" *ngIf="!lostGame && language=='english'"> Please do not refresh web pages from now! </span>
-	<span class="advice" *ngIf="!lostGame && language=='french'"> S'il vous plaît ne rafraîchissez pas les pages webs à partir de maintenant. </span>
-    <span class="advice" *ngIf="!lostGame && language=='english'"> Enter your pseudo if you want to display it on the score page: <input type="text" maxlength="10" (ngModel)="pseudo" /> </span>
-    <span class="advice" *ngIf="!lostGame && language=='french'"> Ecrivez votre pseudo si vous souhaitez le voir apparaître dans la page de scores: <input type="text" maxlength="10" [(ngModel)]="pseudo" /> </span>
-	<div class="reminders" *ngIf="!lostGame">
+	<span class="advice" *ngIf="language=='english'"> Please do not refresh web pages from now! </span>
+	<span class="advice" *ngIf="language=='french'"> S'il vous plaît ne rafraîchissez pas les pages webs à partir de maintenant. </span>
+    <span class="advice" *ngIf="language=='english'"> Enter your pseudo if you want to display it on the score page: <input type="text" maxlength="10" [(ngModel)]="pseudo" /> </span>
+    <span class="advice" *ngIf="language=='french'"> Ecrivez votre pseudo si vous souhaitez le voir apparaître dans la page de scores: <input type="text" maxlength="10" [(ngModel)]="pseudo" /> </span>
+	<div class="reminders">
 		<div class="watermanagementLoading">
 			<div *ngIf="language=='english'"> <i class="fa fa-tint" aria-hidden="true"></i> Ground tank water management: </div>
 			<div *ngIf="language=='french'"> <i class="fa fa-tint" aria-hidden="true"></i> Gestion de l'eau du réservoir principal: </div>

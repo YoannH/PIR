@@ -1,0 +1,102 @@
+@import '~font-awesome/css/font-awesome.css';
+
+.loading{
+	height: 97vh;
+	width: 100vw;
+	font-size: 5vw;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+	background-color: #373737;
+	color: white;
+	font-family: 'Montserrat', sans-serif;
+}
+
+.advice{
+	font-size: 1.7vw;
+}
+
+.loadpart{
+	display: flex;
+	width: 50vw;
+	justify-content: center;
+}
+
+.robotControlLoading{
+	width: 30vw;
+	height: 60vh;
+	font-size: 1.7vw;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around; 
+	border-radius: 10%;
+	border: solid white 0.3vw;
+	padding-left: 1vw;
+	padding-right: 1vw;
+}
+
+.watermanagementLoading{
+	width: 40vw;
+	height: 60vh;
+	font-size: 1.7vw;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	border-radius: 10%;
+	border: solid white 0.3vw;
+	padding-left: 1vw;
+	padding-right: 1vw;
+}
+
+.watermanagementLoading .mainbuttonR{
+	font-size: 3vw;
+}
+
+.watermanagementLoading .mainbuttonL{
+	font-size: 3vw;
+}
+
+.watermanagementLoading .wrenchButton{
+	font-size: 3vw;
+}
+
+.reminders{
+	display: flex;
+	width: 80vw;
+	justify-content: space-around;
+}
+
+.letsplaybutton{
+/*	background-color: #9893da;*/
+	background-color: #05BDFF;
+	padding: 2%;
+	border-radius: 0.5vw;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+}
+
+.result{
+	color: #05BDFF;
+}
+
+.loading input{
+	width: 12vw;
+	color: black;
+}
+
+.mainButton{
+	font-size: 250%;
+/*	background-color: #9893da;*/
+	background-color: #05BDFF;
+	padding: 2%;
+	border-radius: 0.5vw;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	cursor: pointer;
+	color: white;
+}
