@@ -20,7 +20,7 @@ export class AppComponent implements OnInit{
 	public ngOnInit(){
 		this.socket = io("http://localhost:3000");
 		const observable = new Observable(observer => {
-			this.socket.on('recu', (data) => {
+			this.socket.on('recu', (data ) => {
 				observer.next(data);
 			});
 		});

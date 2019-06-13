@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { GlobalDatasService } from '../services/global-datas.service';
-import { Subscription } from 'rxjs/Subscription';
+import { Router } from '@angular/router';
+import { SocketService } from '../services/socket-service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-welcome',
@@ -9,23 +11,77 @@ import { Subscription } from 'rxjs/Subscription';
 })
 export class WelcomeComponent implements OnInit, OnDestroy {
 
-  language : string ;
-  languageSubscription : Subscription;
+  repeater : NodeJS.Timer;
+  emptySlot : boolean;
 
-  constructor(private globalDatasService : GlobalDatasService) {}
+  remainingTime : number ;
+  language : string ;
+
+  tokenSubscription : Subscription;
+  remainingTimeSubscription : Subscription;
+  playSubscription : Subscription;
+
+
+  constructor(private globalDatasService : GlobalDatasService, private socketService : SocketService, private router : Router) {}
 
   ngOnInit() {
-    this.languageSubscription = this.globalDatasService.languageSubject.subscribe(
-      (language : string) => {
-        this.language = language;
+    this.language = this.globalDatasService.language;
+    if(!this.globalDatasService.isAuth){
+      this.socketService.initSocket();
+      this.tokenSubscription = this.socketService.onTokenResponse().subscribe((token) => {
+        this.socketService.token = token;
+        this.globalDatasService.isAuth = true;
+      })
+      
+    }
+    
+    this.remainingTimeSubscription = this.socketService.onRemainingTimeResponse().subscribe((remainingTime) => {
+      this.initTimer(remainingTime);
+    });
+
+    this.playSubscription = this.socketService.onPlayResponse().subscribe((response) => {
+      if(response === "authorized"){
+        this.router.navigate(['/loading']);
       }
-    );
-    this.globalDatasService.emitLanguageSubject();
-    this.globalDatasService.authentify();
+      else{
+        this.initTimer(response);
+      }
+    });
+
+    this.socketService.getRemainingTime();
+
+  }
+
+  play(){
+    this.socketService.getPlay();
+  }
+  
+  initTimer(remainingTime : number){
+    this.remainingTime = remainingTime;
+    if(this.remainingTime == 0){
+      this.emptySlot = true;
+    }
+    else{
+      this.emptySlot = false;
+      clearInterval(this.repeater);
+      this.repeater = setInterval(() => {
+        if (this.remainingTime > 0) {
+          this.remainingTime--;
+        } else {
+          this.emptySlot = true;
+          this.remainingTime = 0;
+          clearInterval(this.repeater);
+        }
+      }, 1000);
+    }
   }
 
   ngOnDestroy() {
-    this.languageSubscription.unsubscribe();
+    if(this.tokenSubscription){
+      this.tokenSubscription.unsubscribe();
+    }
+    this.remainingTimeSubscription.unsubscribe();
+    this.playSubscription.unsubscribe();
   }
 
   changeLanguage(language : string){

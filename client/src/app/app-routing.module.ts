@@ -7,6 +7,7 @@ import { TrainComponent } from './train/train.component';
 import { ScoresComponent } from './scores/scores.component';
 import { VideodemoComponent } from './videodemo/videodemo.component';
 import { AboutComponent } from './about/about.component';
+import { LoadingComponent } from './loading/loading.component';
 
 const routes: Routes = [
   { path: '', component : WelcomeComponent },
@@ -16,6 +17,7 @@ const routes: Routes = [
   { path: 'scores', canActivate : [AuthGuard], component : ScoresComponent },
   { path: 'videodemo', canActivate : [AuthGuard], component : VideodemoComponent},
   { path: 'about', canActivate : [AuthGuard], component : AboutComponent},
+  { path: 'loading', canActivate : [AuthGuard], component : LoadingComponent},
   { path: '**', component : WelcomeComponent }
 ];
 

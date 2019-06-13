@@ -11,10 +11,7 @@ import { interval } from 'rxjs/observable/interval';
 })
 export class TrainComponent implements OnInit, OnDestroy {
 
-
-
-   language : string ;
-   languageSubscription : Subscription;
+  language : string ;
 
    //control x axis
    faucetControl : number = 0;
@@ -99,13 +96,7 @@ export class TrainComponent implements OnInit, OnDestroy {
    ngOnInit() {
 
     //globalDatas and authentification
-     this.languageSubscription = this.globalDatasService.languageSubject.subscribe(
-       (language : string) => {
-         this.language = language;
-       }
-     );
-     this.globalDatasService.emitLanguageSubject();
-     this.globalDatasService.authentify();
+     this.language = this.globalDatasService.language;
 
 
     //leaks init
@@ -174,7 +165,6 @@ export class TrainComponent implements OnInit, OnDestroy {
    }
  
    ngOnDestroy() {
-     this.languageSubscription.unsubscribe();
      this.waterManagementSubscriber.unsubscribe();
      this.waterFlowSubscriber.unsubscribe();
      this.leaksSubscriber.unsubscribe();

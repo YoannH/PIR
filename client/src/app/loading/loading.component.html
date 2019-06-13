@@ -1,0 +1,134 @@
+<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"> 
+
+<div class="loading">
+	<div class="loadpart" *ngIf="!playEnabled && !lostGame">
+		<span *ngIf="language=='english'"> WAITING FOR ANOTHER PLAYER <span *ngIf="dot>0">.</span><span *ngIf="dot>1">.</span><span *ngIf="dot>2">.</span></span>
+		<span *ngIf="language=='french'"> EN ATTENTE D'UN AUTRE JOUEUR <span *ngIf="dot>0">.</span><span *ngIf="dot>1">.</span><span *ngIf="dot>2">.</span></span>
+	</div>
+        <div class="loadpart2" *ngIf="playEnabled && !lostGame">
+		<span style="color: #05BDFF" *ngIf="user.pseudo!='' && language=='english'"> ANOTHER PLAYER HAS BEEN FOUND. THE GAME WILL START IN {{waitingTime}}S! </span>
+		<span style="color: #05BDFF" *ngIf="user.pseudo!='' && language=='french'"> UN AUTRE JOUEUR A ETE TROUVE. LE JEU COMMENCERA DANS  {{waitingTime}}S! </span>
+		<!-- <span *ngIf="language=='english'"> The game is ready! </span>
+		<span *ngIf="language=='french'"> Le jeu est prêt ! </span> -->
+	</div>
+	<!-- <div class="loadpart" *ngIf="lostGame">
+		<span *ngIf="language=='english'"> TOO LATE, SORRY! </span>
+		<span *ngIf="language=='french'"> TROP TARD, désolé ! </span>
+	</div> -->
+	<!-- <span class="advice"> Press F11 for a better experience </span> -->
+	<span class="advice" *ngIf="!lostGame && language=='english'"> Please do not refresh web pages from now! </span>
+	<span class="advice" *ngIf="!lostGame && language=='french'"> S'il vous plaît ne rafraîchissez pas les pages webs à partir de maintenant. </span>
+    <span class="advice" *ngIf="!lostGame && language=='english'"> Enter your pseudo if you want to display it on the score page: <input type="text" maxlength="10" (ngModel)="pseudo" /> </span>
+    <span class="advice" *ngIf="!lostGame && language=='french'"> Ecrivez votre pseudo si vous souhaitez le voir apparaître dans la page de scores: <input type="text" maxlength="10" [(ngModel)]="pseudo" /> </span>
+	<div class="reminders" *ngIf="!lostGame">
+		<div class="watermanagementLoading">
+			<div *ngIf="language=='english'"> <i class="fa fa-tint" aria-hidden="true"></i> Ground tank water management: </div>
+			<div *ngIf="language=='french'"> <i class="fa fa-tint" aria-hidden="true"></i> Gestion de l'eau du réservoir principal: </div>
+			<div class="explainkeys">
+				<div class="mainbuttonL">
+					<i class="fa fa-undo" aria-hidden="true"></i>
+					<div class="wheelsmall"> </div>
+				</div>
+				<div *ngIf="language=='english'"> or </div>
+				<div *ngIf="language=='french'"> ou </div>
+				<div class="anykey">
+					<div style="color: black"> s </div>					
+				</div>
+				<div *ngIf="language=='english'" class="result"> increase wheel's speed <br /> to the left</div>
+				<div *ngIf="language=='french'" class="result"> augmente la vitesse de la roue <br /> vers la gauche</div>
+			</div>
+			<div class="explainkeys">	
+				<div class="mainbuttonR"> 
+					<i class="fa fa-undo" aria-hidden="true"></i>
+					<div class="wheelsmall"> </div>
+				</div>
+				<div *ngIf="language=='english'"> or </div>
+				<div *ngIf="language=='french'"> ou </div>
+				<div class="anykey">
+					<div style="color: black"> d </div>					
+				</div>
+				<div *ngIf="language=='english'" class="result"> increase wheel's speed <br /> to the right </div>
+				<div *ngIf="language=='french'" class="result"> augmente la vitesse de la roue <br /> vers la droite </div>
+			</div>
+			<div class="explainkeys">
+				<div class="pushButton">
+					<div class="buttonTap">
+					</div>
+				</div>
+				<div *ngIf="language=='english'"> or </div>
+				<div *ngIf="language=='french'"> ou </div>
+				<div class="anykey">
+					<div style="color: black"> e </div>					
+				</div>
+				<div *ngIf="language=='english'" class="result"> tap opens few seconds </div>
+				<div *ngIf="language=='french'" class="result"> le robinet s'ouvre quelques secondes </div>
+			</div>
+			<div class="explainkeys">
+				<div class="wrenchButton">
+					<i class="fa fa-wrench" aria-hidden="true"></i>
+				</div>
+				<div *ngIf="language=='english'"> or </div>
+				<div *ngIf="language=='french'"> ou </div>
+				<div class="anykey">
+					<div style="color: black"> a </div>					
+				</div>
+				<div *ngIf="language=='english'" class="result"> allows to fix leaks </div>
+				<div *ngIf="language=='french'" class="result"> permet de réparer les fuites </div>
+			</div>				
+		</div>
+		<div class="robotControlLoading">
+			<div *ngIf="language=='english'"> <i class="fa fa-gamepad" aria-hidden="true"></i> Control of the robot: </div>
+			<div *ngIf="language=='french'"> <i class="fa fa-gamepad" aria-hidden="true"></i> Contrôle du robot : </div>
+			<div class="explainkeys">
+				<div class="spaceKey">
+					<div *ngIf="language=='english'" style="color: black"> SPACE </div>
+					<div *ngIf="language=='french'" style="color: black"> ESPACE </div>					
+				</div>
+				<div class="littlesplatch">
+				</div>
+			</div>
+			<div class="explainkeys">
+				<div class="centeranykey">
+					<div class="anykey">
+						<div style="color: black"> <i class="fa fa-arrow-up" aria-hidden="true"></i> </div>					
+					</div>
+				</div>
+				<div class="arrowFor">
+				</div>
+			</div>
+			<div class="explainkeys">
+				<div class="centeranykey">
+					<div class="anykey">
+						<div style="color: black"> <i class="fa fa-arrow-down" aria-hidden="true"></i> </div>					
+					</div>
+				</div>
+				<div class="arrowBack">
+				</div>
+			</div>
+			<div class="explainkeys">
+				<div class="centeranykey">
+					<div class="anykey">
+						<div style="color: black"> <i class="fa fa-arrow-left" aria-hidden="true"></i> </div>					
+					</div>
+				</div>
+				<div class="arrowLeft">
+				</div>
+			</div>
+			<div class="explainkeys">
+				<div class="centeranykey">
+					<div class="anykey">
+						<div style="color: black"> <i class="fa fa-arrow-right" aria-hidden="true"></i> </div>					
+					</div>
+				</div>
+				<div class="arrowRight">
+				</div>
+			</div>
+			<!--<div *ngIf="emptySlot">
+				Slot libre
+				<button ng-click="play()">Jouer</button>
+			</div>-->
+		</div>
+	</div>
+	<!-- <div ui-sref="welcome" class="gohomeTrain" *ngIf="lostGame && language=='english'" ng-click="reload()"> <i class="fa fa-reply" aria-hidden="true"></i> back to main menu </div>
+	<div ui-sref="welcome" class="gohomeTrain" *ngIf="lostGame && language=='french'" ng-click="reload()"> <i class="fa fa-reply" aria-hidden="true"></i> retour au menu principal </div> -->
+</div>
