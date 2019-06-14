@@ -34,6 +34,13 @@ export class SocketService {
         this.socket.emit("ready", { token : this.token });
     }
 
+    //keys
+
+    public sendKey(key : string){
+        this.socket.emit("key", { key: key, token : this.token});
+    }
+
+
     public onTokenResponse(): Observable<any>{
         return new Observable<any>( observer => {
             this.socket.on('tokenResponse' , (data) => {observer.next(data.token);
@@ -71,6 +78,14 @@ export class SocketService {
     public onLaunchFailedResponse(){
         return new Observable<any>( observer => {
             this.socket.on('launchFailed', (data) => {observer.next(data.waitingAgain);});
+        });
+    }
+
+
+    public onGameData(){
+        return new Observable<any>( observer => {
+            
+            this.socket.on('gameData', (data) => {observer.next(data);});
         });
     }
 
