@@ -158,6 +158,10 @@ io.on('connection', (socket) => {
 	});
 
 	//key controls
+	socket.on('clickLeak', (data) => {
+		clickLeak(data.key);
+	});
+
 	socket.on('key', (data) => {
 		var playerData;
 		if(data.token === player1){
@@ -166,25 +170,41 @@ io.on('connection', (socket) => {
 			playerData = player2Datas;
 		}
 		var key = data.key;
-		if(key == 'up'){
+		if(key == 'updown'){
 			playerData.direction = 1;
-			if(upTimeout){clearTimeout(upTimeout);}
-			upTimeout = setTimeout(() => { playerData.direction = 0}, 100);
 		}
-		else if(key =='down'){
+		else if(key == 'upup'){
+			playerData.direction = 0;
+		}
+		else if(key =='downdown'){
 			playerData.direction = -1;
-			if(downTimeout){clearTimeout(downTimeout);}
-			downTimeout = setTimeout(() => { playerData.direction = 0}, 100);
 		}
-		else if(key =='left'){
-			playerData.rotDirection = -1;
-			if(leftTimeout){clearTimeout(leftTimeout);}
-			leftTimeout = setTimeout(() => { playerData.rotDirection = 0}, 100);
+		else if(key =='downup'){
+			playerData.direction = 0;
 		}
-		else if(key =='right'){
+		else if(key =='rightdown'){
 			playerData.rotDirection = 1;
-			if(rightTimeout){clearTimeout(rightTimeout);}
-			rightTimeout = setTimeout(() => { playerData.rotDirection = 0}, 100);
+		}
+		else if(key =='rightup'){
+			playerData.rotDirection = 0;
+		}
+		else if(key =='leftdown'){
+			playerData.rotDirection = -1;
+		}
+		else if(key =='leftup'){
+			playerData.rotDirection = 0;
+		}
+		else if(key == 'a'){
+			wrenchOnOff();
+		}
+		else if(key == 'e'){
+			waterPushButton();
+		}
+		else if(key == 's'){
+			faucetCtrlFctMinus();
+		}
+		else if(key == 'd'){
+			faucetCtrlFctPlus();
 		}
 
 	});
@@ -200,6 +220,8 @@ var player2Datas = {};
 var player1Role;
 var player2Role;
 
+var water = {};
+var waterRepeater;
 var player1DatasToSend = {};
 var player2DatasToSend = {};
 var isFinished;
@@ -207,11 +229,13 @@ var timer;
 var timeStep = 0.04;
 var sendData;
 var calculateData;
-var player1Data = {};
-var player2Data = {};
-var player1Forward = false;
-var player2Forward = false;
+var waterManagementInterval;
+var waterFlowInterval;
+var leaksInterval;
 
+
+
+var leakPlacesNb = 9;
 
 function startGame(){
 	var p = Math.random();
@@ -230,13 +254,77 @@ function startGame(){
 		socketNb2.emit('role', 'tanker');
 		initTanker(player2Datas);
 	}
+
+	initWater();
 	player1DatasToSend.pos = player1Datas.pos;
 	player1DatasToSend.other = player2Datas.pos;
+	player1DatasToSend.water = water;
 	player2DatasToSend.pos = player2Datas.pos;
 	player2DatasToSend.other = player1Datas.pos;
+	player2DatasToSend.water = water;
 
 	isFinished = false;
 	remainingTime = 300;
+
+
+
+	calculateData = setInterval(() => {
+		if(!isFinished){
+			dataProcessing();
+		}else{
+			clearInterval(calculateData);
+		}
+	}, 40);
+
+	waterManagementInterval = setInterval(() => {
+		if((water.xRobinet <= 80) && (water.xRobinet >= 0)) {
+			water.xRobinet = water.xRobinet + water.coeffSpeed * (Math.PI / 80) * Math.sin(Math.PI * water.xRobinet / 40 - Math.PI) + water.faucetControl;
+		  } else if(water.xRobinet > 80) {
+			water.xRobinet = 80;
+		  } else if(water.xRobinet < 0) {
+			  water.xRobinet = 0;
+		  }
+		  //water.xRobinet += water.decal;
+		  water.faucetXAxis = (water.xRobinet - 40) * 10 / 40;
+		  water.yRobinet = water.coeffXRob * Math.cos(water.faucetXAxis* Math.PI *2 / 20) + water.constXRob;
+	
+	}, 200);
+
+	waterFlowInterval = setInterval(() => {
+		var leaksSum = 0;
+		for(var i = 0; i < leakPlacesNb; i++) {
+		  if(!water.noLeakAt[i]){
+			leaksSum = leaksSum + 1;
+		  }
+		}
+		if(water.waterLevelContainer <= 100){
+		  water.waterLevelContainer -= leaksSum/(2*leakPlacesNb);
+		  if((water.faucetXAxis < 2) && (water.faucetXAxis > -2)){
+			water.waterLevelContainer += water.waterWidth*10/7;
+		  }
+		}
+		else{
+		  water.waterLevelContainer -= leaksSum/leakPlacesNb;
+		}
+	}, 200);
+
+	leaksInterval = setInterval(() => {
+		if(Math.random() < 0.5) {
+			var myInt = Math.floor(Math.random()* leakPlacesNb);
+			water.noLeakAt[myInt] = false;
+		  }
+		  for (var i=0 ; i < water.leakPlaces.length ; i++){
+			if (!water.noLeakAt[i] && water.previousNoLeakAt[i]){
+			  if (Math.random()>0.5){
+				water.leaksReverse[i] = -1;
+			  } else{
+				water.leaksReverse[i] = 1;
+			  }
+			  water.leftValues[i] = Math.random()*30;
+			  water.previousNoLeakAt[i] = water.noLeakAt[i];
+			}
+		  }
+	}, 5000);
 
 	timer = setInterval(() => {
 		if(!isFinished && remainingTime > 0){
@@ -245,6 +333,7 @@ function startGame(){
 			clearInterval(timer);
 		}
 	}, 1000);
+
 
 	sendData = setInterval(() => {
 		if(!isFinished){		
@@ -255,15 +344,49 @@ function startGame(){
 		}
 	}, 50);
 
-	calculateData = setInterval(() => {
-		if(!isFinished){
-			dataProcessing();
-		}else{
-			clearInterval(calculateData);
-		}
-	}, 40);
+	
 	
 }
+
+
+
+function initWater(){
+	
+	water.leakPlaces  = [];
+	water.noLeakAt  = [];
+	water.previousNoLeakAt  = [];
+	water.leaksReverse  = [];
+	water.leftValues = [];
+	water.leakCounter  = 0;
+
+	water.faucetControl  = 0;
+	water.faucetControlShow = '0';
+	water.direction = 0;
+	water.animTime  = 0;
+ 	
+	water.waterWidth = 0;
+	water.callCount  = 0;
+	
+	water.wrenchMode = false;
+
+	water.xRobinet  = 42;
+	water.coeffSpeed  = 20;
+	water.faucetXAxis = 2 * 10 / 40;
+	water.yRobinet = 0 ;
+	water.coeffXRob = 10;
+	water.constXRob  = 50;
+	water.waterLevelContainer = 50;
+
+	for (var i=0; i < leakPlacesNb; i++) {
+		water.leakPlaces.push(water.leakCounter);
+		water.leakCounter++;
+		water.noLeakAt.push(true);
+		water.previousNoLeakAt.push(true);
+		water.leftValues.push(0);
+		water.leaksReverse.push(0);
+	  }
+}
+
 
 function initSpeeder(player){
 	player.pos = [75, 60, Math.PI];
@@ -298,10 +421,77 @@ function processPosition(player){
 		player.pos[0] -= 0.5* player.transSpeed * timeStep * Math.cos(player.pos[2]);
 		player.pos[1] -= 0.5 * player.transSpeed * timeStep * Math.sin(player.pos[2]);
 	}
+	for(var i = 0; i<2; i++){
+		if(player.pos[i] < 0){
+			player.pos[i] = 0;
+		}
+		if(player.pos[i] > 100){
+			player.pos[i] = 100;
+		}
+	}
 	player.pos[2] += player.rotDirection * timeStep * player.rotSpeed; 
 
 }
 
+function faucetCtrlFctMinus(){
+    if(water.faucetControl > -3) {
+      water.faucetControl--; 
+      water.faucetControlShow = water.faucetControl.toString();
+    }
+    if(water.faucetControl > 0){
+        water.faucetControlShow = '+' + water.faucetControl.toString();
+        water.direction = 1;
+      }
+    else if(water.faucetControl < 0){
+      water.direction = -1;
+    }
+    else{
+      water.direction = 0;
+    }
+    water.animTime = 10 - Math.abs(water.faucetControl)*3;
+}
 
+function faucetCtrlFctPlus(){
+    if(water.faucetControl < 3) {
+      water.faucetControl++; 
+      water.faucetControlShow = water.faucetControl.toString();
+    }
+    if(water.faucetControl > 0){
+        water.faucetControlShow = '+' + water.faucetControl.toString();
+        water.direction = 1;
+      }
+    else if(water.faucetControl < 0){
+      water.direction = -1;
+    }
+    else{
+      water.direction = 0;
+    }
+    water.animTime = 7 - Math.abs(water.faucetControl)*2;
+}
+
+function waterPushButton(){
+    water.waterWidth = 7/10;
+    water.callCount = 1;
+    clearInterval(waterRepeater);
+    waterRepeater = setInterval(() => {
+      if (water.callCount < 8) {
+        water.waterWidth = (7 - water.callCount)/10;
+        water.callCount++;
+      } else {
+        clearInterval(water.repeater);
+      }
+    }, 1000);
+}
+
+function clickLeak(leakId) {
+    if(water.wrenchMode) {
+      water.noLeakAt[leakId] = true;
+      water.wrenchMode = false;
+	}
+}
+
+function wrenchOnOff(){
+    water.wrenchMode = !water.wrenchMode;
+}
 
 

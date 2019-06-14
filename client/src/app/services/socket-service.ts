@@ -36,6 +36,10 @@ export class SocketService {
 
     //keys
 
+    public clickLeak(key : number){
+        this.socket.emit("clickLeak", {key : key});
+    }
+
     public sendKey(key : string){
         this.socket.emit("key", { key: key, token : this.token});
     }
