@@ -17,6 +17,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
   waitingTime : number;
   dot : number = 0;
   dotRepeater : NodeJS.Timer;
+  isReady : boolean=false;
 
   launchFailedSubscription : Subscription;
   launchingGameSubscription : Subscription;
@@ -45,6 +46,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
       if(waitingAgain){
         this.anotherPlayer = false;
         this.initDotTimer();
+        this.isReady = false;
       }else{
         this.router.navigate(['/welcome']);
       }
@@ -60,6 +62,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
 
   ready(){
     this.socketService.sendReady();
+    this.isReady = true;
   }
 
   initDotTimer(){

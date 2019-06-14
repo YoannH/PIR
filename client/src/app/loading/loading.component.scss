@@ -1,5 +1,9 @@
 @import '~font-awesome/css/font-awesome.css';
 @import './../main/main.component.scss';
+<<<<<<< HEAD
+=======
+
+>>>>>>> f250ae6f79afd5fc2c4ceab20305273e3e7955dd
 
 .loading{
 	height: 97vh;
@@ -89,7 +93,7 @@
 }
 
 .mainButton{
-	font-size: 250%;
+	font-size: 3vw;
 /*	background-color: #9893da;*/
 	background-color: #05BDFF;
 	padding: 2%;
@@ -97,7 +101,7 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	height: 100%;
+	height: 0%;
 	cursor: pointer;
 	color: white;
 }
