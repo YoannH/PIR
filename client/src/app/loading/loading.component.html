@@ -6,9 +6,12 @@
 		<span *ngIf="language=='french'"> EN ATTENTE D'UN AUTRE JOUEUR <span *ngIf="dot>0">.</span><span *ngIf="dot>1">.</span><span *ngIf="dot>2">.</span></span>
 	</div>
     <div class="loading" *ngIf="anotherPlayer">
-		<span style="color: #05BDFF" *ngIf="language=='english'"> ANOTHER PLAYER HAS BEEN FOUND. THE GAME WILL START IN {{waitingTime || 15}}S! </span>
-		<span style="color: #05BDFF" *ngIf="language=='french'"> UN AUTRE JOUEUR A ETE TROUVE. LE JEU COMMENCERA DANS  {{waitingTime || 15}}S! </span>
-		<div class="mainbutton" (click)="ready()">Clickez sur ce boutton pour jouer dans {{waitingTime}}S.</div>
+		<span style="color: #05BDFF" *ngIf="language=='english'"> ANOTHER PLAYER HAS BEEN FOUND. <br>THE GAME WILL START IN {{waitingTime || 15}}S! </span>
+		<span style="color: #05BDFF" *ngIf="language=='french'"> UN AUTRE JOUEUR A ETE TROUVE. <br>LE JEU COMMENCERA DANS  {{waitingTime || 15}}S! </span>
+		<div class="mainButton" *ngIf="!isReady && language=='english'" (click)="ready()">Click this button to play within {{waitingTime}}S.</div>
+		<div class="mainButton" *ngIf="!isReady && language=='french'" (click)="ready()">Clickez sur ce boutton pour jouer dans {{waitingTime}}S.</div>
+		<div class="loapart" *ngIf="isReady && language=='english'">You are ready!</div>
+		<div class="loapart" *ngIf="isReady && language=='french'">Vous êtes prêt!</div>
 		<!-- <span *ngIf="language=='english'"> The game is ready! </span>
 		<span *ngIf="language=='french'"> Le jeu est prêt ! </span> -->
 	</div>
