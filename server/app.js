@@ -230,6 +230,24 @@ io.on('connection', (socket) => {
 			}
 			throwWater(player, socket);
 		}
+		else if(key == '1'){
+			sendMessage(1,data.token);
+		}
+		else if(key == '2'){
+			sendMessage(2,data.token);
+		}
+		else if(key == '3'){
+			sendMessage(3,data.token);
+		}
+		else if(key == '4'){
+			sendMessage(4,data.token);
+		}
+		else if(key == '5'){
+			sendMessage(5,data.token);
+		}
+		else if(key == '6'){
+			sendMessage(6,data.token);
+		}
 
 	});
 
@@ -765,6 +783,17 @@ function wrenchOnOff(){
 
 function distance(point1, point2){
 	return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
+}
+
+function sendMessage(id, token){
+	if(token == player1){
+		socketNb1.emit("messageSent", {id : id});
+		socketNb2.emit("messageReceived", {id : id});
+	}
+	else{
+		socketNb1.emit("messageReceived", {id : id});
+		socketNb2.emit("messageSent", {id : id});
+	}
 }
 
 function killAll(){

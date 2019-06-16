@@ -44,7 +44,27 @@ export class MainComponent implements OnInit, OnDestroy {
     }else if(event.keyCode === 32 && !this.spacePressed){
       this.spacePressed = true;
       this.socketService.sendKey('space');
+    }else if(event.keyCode === 49 && !this.onePressed){
+      this.onePressed = true;
+      this.socketService.sendKey('1');
+    }else if(event.keyCode === 50 && !this.twoPressed){
+      this.twoPressed = true;
+      this.socketService.sendKey('2');
+    }else if(event.keyCode === 51 && !this.threePressed){
+      this.threePressed = true;
+      this.socketService.sendKey('3');
+    }else if(event.keyCode === 52 && !this.fourPressed){
+      this.fourPressed = true;
+      this.socketService.sendKey('4');
+    }else if(event.keyCode === 53 && !this.fivePressed){
+      this.fivePressed = true;
+      this.socketService.sendKey('5');
+    }else if(event.keyCode === 54 && !this.sixPressed){
+      this.sixPressed = true;
+      this.socketService.sendKey('six');
     }
+    
+    
   }
 
   @HostListener('document:keyup', ['$event']) onKeyup(event : KeyboardEvent){
@@ -70,6 +90,18 @@ export class MainComponent implements OnInit, OnDestroy {
       this.ePressed = false;    
     }else if(event.keyCode === 32){
       this.spacePressed = false;    
+    }else if(event.keyCode === 49){
+      this.onePressed = false;    
+    }else if(event.keyCode === 50){
+      this.twoPressed = false;    
+    }else if(event.keyCode === 51){
+      this.threePressed = false;    
+    }else if(event.keyCode === 52){
+      this.fourPressed = false;    
+    }else if(event.keyCode === 53){
+      this.fivePressed = false;    
+    }else if(event.keyCode === 54){
+      this.sixPressed = false;    
     }
   }
 
@@ -91,6 +123,12 @@ export class MainComponent implements OnInit, OnDestroy {
   sPressed : boolean = false;
   dPressed : boolean = false;
   ePressed : boolean = false;
+  onePressed : boolean = false;
+  twoPressed : boolean = false;
+  threePressed : boolean = false;
+  fourPressed : boolean = false;
+  fivePressed : boolean = false;
+  sixPressed : boolean = false;
   spacePressed : boolean = false;
   propFromTop : number;
   propFromLeft : number;
@@ -267,7 +305,7 @@ export class MainComponent implements OnInit, OnDestroy {
       this.fires = data.fires;
       this.nbFighted = data.teamScore;
       this.temperature = data.temperature;
-      console.log(data.temperature);
+    
       this.hotScreen = this.temperature/100;
     });
   
