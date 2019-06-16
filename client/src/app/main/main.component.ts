@@ -41,6 +41,9 @@ export class MainComponent implements OnInit, OnDestroy {
     }else if(event.keyCode === 69 && !this.ePressed){
       this.ePressed = true;
       this.socketService.sendKey('e');
+    }else if(event.keyCode === 32 && !this.spacePressed){
+      this.spacePressed = true;
+      this.socketService.sendKey('space');
     }
   }
 
@@ -65,7 +68,14 @@ export class MainComponent implements OnInit, OnDestroy {
       this.dPressed = false;    
     }else if(event.keyCode === 69){
       this.ePressed = false;    
+    }else if(event.keyCode === 32){
+      this.spacePressed = false;    
     }
+  }
+
+  @HostListener('window:popstate', ['$event'])  onPopState(event) {
+    this.socketService.killAll();
+    this.globalDatasService.popState = true;
   }
   
   
@@ -81,6 +91,7 @@ export class MainComponent implements OnInit, OnDestroy {
   sPressed : boolean = false;
   dPressed : boolean = false;
   ePressed : boolean = false;
+  spacePressed : boolean = false;
   propFromTop : number;
   propFromLeft : number;
   rotInRad : number;
@@ -122,7 +133,29 @@ export class MainComponent implements OnInit, OnDestroy {
   otherPropFromLeft : number;
   otherRotInRad : number;
 
+  nbFighted : number = 0;
+  remainingTime : number = 600;
+  temperature : number = 0;
+  hotScreen : number = 0;
+
+  role : string ;
+  trees : any;
+  zones : any = { batteryZone : { x : 0, y : 0},
+                  waterZone : { x : 0, y : 0}};
+
+  fires : any;
+
+  watLevel : number = 50;
+
+  waterize : boolean = false;
+
+  batteryLevel : number = 100;
+  treesLocationsSubscription : Subscription;
+  zonesLocationsSubscription : Subscription;
+  roleSubscription : Subscription;
   gameDataSubscription : Subscription;
+  disconnectionSubscription : Subscription;
+  waterThrowedSubscription : Subscription;
 
   constructor(private globalDatasService : GlobalDatasService, private socketService : SocketService, private router : Router) { }
 
@@ -180,7 +213,28 @@ export class MainComponent implements OnInit, OnDestroy {
     // undefined,
     // 'down' ));
  
+    this.treesLocationsSubscription = this.socketService.onTreesLocations().subscribe((trees) => {
+      this.trees = trees;
+    });
 
+    this.zonesLocationsSubscription = this.socketService.onZonesLocations().subscribe((zones) => {
+      this.zones = zones;
+    });
+
+    this.roleSubscription = this.socketService.onRoles().subscribe((role) => {
+      this.role = role;
+    });
+
+    this.disconnectionSubscription = this.socketService.onDisconnected().subscribe(() => {
+      this.router.navigate(['/welcome']);
+    });
+
+    this.waterThrowedSubscription = this.socketService.onWaterThrowed().subscribe(() => {
+      this.waterize = true;
+      setTimeout(() => {
+        this.waterize = false;
+      }, 100);
+    });
     
 
     this.gameDataSubscription = this.socketService.onGameData().subscribe((data)=>{
@@ -206,16 +260,28 @@ export class MainComponent implements OnInit, OnDestroy {
       this.leftValues = water.leftValues;
       this.faucetControl = water.faucetControl;
     
+      this.remainingTime = data.remainingTime;
+      this.batteryLevel = data.batteryLevel;
     
-
+      this.watLevel = data.waterLevel;
+      this.fires = data.fires;
+      this.nbFighted = data.teamScore;
+      this.temperature = data.temperature;
+      console.log(data.temperature);
+      this.hotScreen = this.temperature/100;
     });
   
     this.language = this.globalDatasService.language;
 
+    this.socketService.readyToPlay();
   }
 
   ngOnDestroy(){
     this.gameDataSubscription.unsubscribe();
+    this.treesLocationsSubscription.unsubscribe();
+    this.zonesLocationsSubscription.unsubscribe();
+    this.roleSubscription.unsubscribe();
+    this.disconnectionSubscription.unsubscribe();
   }
 
 
@@ -239,5 +305,9 @@ export class MainComponent implements OnInit, OnDestroy {
     this.socketService.sendKey('a');
   }
 
+  killAll(){
+    this.socketService.killAll();
+    this.router.navigate(['/welcome']);
+  }
 }
 

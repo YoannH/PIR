@@ -35,7 +35,7 @@
 	</div> -->
 
 	<div class="leftPart">  
-		<!-- <div class="missionBlock">
+		<div class="missionBlock">
 			<div class="maincontainermission">
 				<div class="iconCircle">
 					<i class="fa fa-trophy" aria-hidden="true"></i>
@@ -47,16 +47,16 @@
 					<div class="missioninfo">
 						<div class="numbersinfo"> 
 							<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
-							{{nbfighted}} 
+							{{nbFighted}} 
 						</div> 
-						<div  class="numbersinfo"> <i class="fa fa-clock-o" aria-hidden="true"></i>   {{remainingtime}} </div>
+						<div  class="numbersinfo"> <i class="fa fa-clock-o" aria-hidden="true"></i>   {{remainingTime}} </div>
 					</div>
 					<div class="onoff">						
-						<i (click)="killall()" class="fa fa-power-off" aria-hidden="true"></i>	
+						<i (click)="killAll()" class="fa fa-power-off" aria-hidden="true"></i>	
 					</div>
 				</div>
 			</div>
-		</div> -->
+		</div>
 		<div class="waterBlock"> 
 			<div class="maincontainer">
 				<div class="iconCircle">
@@ -148,15 +148,44 @@
 		<div class="videoBlock"> 
 			<div class="maincontainercam">
 				<div class="streamcamera">
-					<!-- <img class="imagecam" ng-src={{addressUpdated}} scrolling="no" frameBorder="0"> -->
-					<!-- <div class="splatchContainer">
-				        	<div class="splatch" [ngClass]="{visiblesplatch: waterize}">
-				        	</div>
+					<div class="maincontainersec">
+						<div class="mapblock">
+								
+							<div class="map">
+								<!-- <i class="fa fa-circle-thin" [ngStyle]="{top: propFromTop - 10 + '%', left: propFromLeft -10 +  '%',  position: absolute, color:red}" aria-hidden="true"></i> -->
+								<div class="pointcontainer" [ngStyle]="{top: propFromTop  -4 + '%', left: propFromLeft - 4  +  '%', transform: 'rotate('+ rotInRad +'rad)'}">
+								<div class="point"></div></div>
+								<div class="other" [ngStyle]="{top: otherPropFromTop -1.5 + '%', left: otherPropFromLeft -1.5  +  '%', transform: 'rotate('+ otherRotInRad +'rad)'}">
+								</div>
+								<div class = "treeContainer" *ngFor="let value of trees; let key = index" [ngStyle]="{top: value.y - 5 +'%', left: value.x -5 + '%'}">
+								<div class="tree" >
+								</div>
+								</div>
+								<div class="fireContainer" *ngFor="let value of fires; let key = index" [ngStyle]="{top: trees[key].y  - 5 +'%', left: trees[key].x - 5 +  '%', opacity: fires[key]}">
+									<div class="fire">
+									</div>
+								</div> 
+								 <div class="loadlocB" [ngStyle]="{top: zones.batteryZone.y +'%', left:  zones.batteryZone.x +'%'}">
+									<i class="fa fa-bolt" aria-hidden="true"></i>					
+								</div>
+								<div class="loadlocW" [ngStyle]="{top: zones.waterZone.y + '%', left: zones.waterZone.x + '%'}"> 
+									 <div>
+										<i class="fa fa-tint" aria-hidden="true"></i>
+									</div>						 
+									<!-- <div class="waterlevelmap" [ngStyle]="{height: waterLevelContainerMap + 'px'}"> </div>-->
+												
+								 </div> 
+								 <div class="splatchContainer">
+										<div class="splatch" [ngClass]="{visiblesplatch: waterize}">
+										</div>
+								<div class="redhotContainer">
+											<div class="redhot" [ngStyle]="{opacity: hotScreen}">
+											</div>
+									</div>
+							</div>
+							</div>
+						</div>
 					</div>
-					<div class="redhotContainer">
-				        	<div class="redhot" [ngStyle]="{opacity: hotScreen}">
-				        	</div>
-					</div> -->
 				</div>
 			</div>		
 		</div>
@@ -169,29 +198,12 @@
 					<div class="linktoicon">
 						<i class="fa fa-globe" aria-hidden="true"></i>
 					</div>
-					<div class="maincontainersec">
-						<div class="mapblock">
-							<div class="map">
-								<div class="point" [ngStyle]="{top: propFromTop + '%', left: propFromLeft +  '%', transform: 'rotate('+ rotInRad +'rad)'}"></div>
-								<div class="point" [ngStyle]="{color: red, top: otherPropFromTop + '%', left: otherPropFromLeft +  '%', transform: 'rotate('+ otherRotInRad +'rad)'}">
-								</div>
-								<!-- <div class="tree" *ngFor="let value of trees; let key = index" [ngStyle]="{top: value.y, left: value.x}">
-								</div>
-								<div class="fire" *ngFor="let value of firesloc; let key = index" [ngStyle]="{top: value.y, left: value.x, opacity: opacityFire[key]}">
-								</div> -->
-								<!-- <div class="loadlocB" [ngStyle]="{top: zones[1].y, left: zones[1].x}">
-									<i class="fa fa-bolt" aria-hidden="true"></i>					
-								</div>
-								<div class="loadlocW" [ngStyle]="{top: zones[0].y, left: zones[0].x}"> -->
-									<!-- <div>
-										<i class="fa fa-tint" aria-hidden="true"></i>
-									</div>						 -->
-									<!-- <div class="waterlevelmap" [ngStyle]="{height: waterLevelContainerMap + 'px'}"> </div>-->
-												
-								<!-- </div> -->
-							</div>
-						</div>
-					</div>
+					
+
+
+
+
+
 				</div>
 				<div class="iconscontents2">
 					<div class="linktoicon">
@@ -212,8 +224,7 @@
 								<div class="batTemp">
 									<div class="connectbat">
 										<div class="battery">
-											<!-- <div class="batlev"  [ngStyle]="{width: battLevel+'%'}"> </div>-->
-											
+											<div class="batlev"  [ngStyle]="{width: batteryLevel+'%'}"> </div>											
 										</div>
 										<div class="batconnect">
 										</div>
@@ -227,7 +238,7 @@
 											<div class="someRed">
 											</div>
 											<div class="thermometer">
-												<!-- <div class="mercure" [ngStyle]="{height: mercureLevel}"> </div> 	 -->
+												 <div class="mercure" [ngStyle]="{height: temperature + '%'}"> </div> 	 
 												
 											</div>								
 										</div>	
@@ -241,7 +252,7 @@
 								</div>
 								<div class="waterlevelbar">
 									<div class="waterlevelcont">
-										<!-- <div class="waterlevel" [ngStyle]="{width: watLevel +'%'}"> </div>-->
+										 <div class="waterlevel" [ngStyle]="{width: watLevel +'%'}"> </div>
 										
 									</div>
 								</div>

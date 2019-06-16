@@ -34,6 +34,13 @@ export class SocketService {
         this.socket.emit("ready", { token : this.token });
     }
 
+    public readyToPlay() : void {
+        this.socket.emit("readyToPlay", { token : this.token});
+    }
+
+    public killAll() : void {
+        this.socket.emit("killAll", { token : this.token});
+    }
     //keys
 
     public clickLeak(key : number){
@@ -93,5 +100,38 @@ export class SocketService {
         });
     }
 
+    public onTreesLocations(){
+        return new Observable<any>( observer => {
+            
+            this.socket.on('trees', (data) => {observer.next(data.trees);});
+        }); 
+    }
 
+    public onZonesLocations(){
+        return new Observable<any>( observer => {
+            
+            this.socket.on('zones', (data) => {observer.next(data.zones);});
+        }); 
+    }
+
+    public onRoles(){
+        return new Observable<any>( observer => {
+            
+            this.socket.on('role', (data) => {observer.next(data.role);});
+        }); 
+    }
+
+    public onDisconnected(){
+        return new Observable<any>( observer => {
+            
+            this.socket.on('disconnected', (data) => {observer.next();});
+        }); 
+    }
+
+    public onWaterThrowed(){
+        return new Observable<any>( observer => {
+            
+            this.socket.on('waterThrowed', (data) => {observer.next();});
+        });       
+    }
 }

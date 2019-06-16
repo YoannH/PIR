@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, HostListener } from '@angular/core';
 import { GlobalDatasService } from '../services/global-datas.service';
 import { Router } from '@angular/router';
 import { SocketService } from '../services/socket-service';
@@ -10,6 +10,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./loading.component.scss']
 })
 export class LoadingComponent implements OnInit, OnDestroy {
+
 
   @Input() pseudo : string;
   anotherPlayer : boolean =false;
@@ -51,6 +52,11 @@ export class LoadingComponent implements OnInit, OnDestroy {
         this.router.navigate(['/welcome']);
       }
     });
+
+    if(this.globalDatasService.popState){
+      this.globalDatasService.popState = false;
+      this.router.navigate(['/welcome']);
+      }
   }
 
   ngOnDestroy() {
