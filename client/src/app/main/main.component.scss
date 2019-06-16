@@ -220,7 +220,7 @@
 
 
 
-.rightPart{
+.centerPart{
 	width: 65%;
 	height: 100%;
 /*	background-color: green;*/
@@ -2089,4 +2089,142 @@
 	display: flex;
 	align-items: center;
 	margin-left: 0.2vw;
+}
+
+.rightPart{
+	width: 20%;
+	height: 100%;
+	display: flex;
+	justify-content:  space-around;
+	flex-direction: column;
+	align-items: center;
+}
+
+.coopActions{
+	display: flex;
+	justify-content:  space-around;
+	align-items: center;
+	height: 25%;
+	width: 95%;
+	border: solid #333 0.3vw;
+	border-radius: 1vw;
+}
+
+.exchangeRessources{
+	display: flex;
+	flex-direction: column;
+	justify-content:  space-around;
+	align-items: center;
+	height: 90%;
+	width: 45%;
+}
+
+.sendWater{
+	height: 3vw;
+	width: 6.5vw;
+	background-size: 6.5vw 3vw;
+	margin-top: 0.5vw;
+	background-image: url("src/assets/images/SendWater.png");
+}
+
+
+.sendElec{
+	height: 3vw;
+	width: 6.5vw;
+	background-size: 6.5vw 3vw;
+	margin-top: 0.5vw;
+	background-image: url("src/assets/images/SendElec.png");
+}
+
+
+.receiveWater{
+	height: 3vw;
+	width: 6.5vw;
+	background-size: 6.5vw 3vw;
+	margin-top: 0.5vw;
+	background-image: url("src/assets/images/ReceiveWater.png");
+}
+
+
+.receiveElec{
+	height: 3vw;
+	width: 6.5vw;
+	background-size: 6.5vw 3vw;
+	margin-top: 0.5vw;
+	background-image: url("src/assets/images/ReceiveElec.png");
+}
+
+.comms{
+	display: flex;
+	flex-direction: column;
+	justify-content:  space-around;
+	align-items: center;
+	height: 35%;
+	width: 95%;
+	border: solid #333 0.3vw;
+	border-radius: 1vw;
+}
+
+.commButton1{
+	display: flex;
+	justify-content:  space-around;
+	align-items: center;
+	background-color: lightgreen;
+	height: 15%;
+	width: 95%;
+	border: solid #333 0.3vw;
+	font-size: 2.5vh;
+}
+
+.commButton2{
+	display: flex;
+	justify-content:  space-around;
+	align-items: center;
+	background-color: lightblue;
+	height: 15%;
+	width: 95%;
+	border: solid #333 0.3vw;
+	font-size: 2.5vh;
+}
+
+.commButton3{
+	display: flex;
+	justify-content:  space-around;
+	align-items: center;
+	background-color: white;
+	height: 15%;
+	width: 95%;
+	border: solid #333 0.3vw;
+	font-size: 2.5vh;
+}
+
+.chatbox{
+	display: flex;
+	flex-direction: column;
+	background-color: white;
+	height: 30%;
+	width: 95%;
+	border: solid #333 0.3vw;
+	border-radius: 1vw;
+	font-size: 1.5vw;
+}
+
+.textReceived{
+	text-align: left;
+	margin-left: 1vh;
+	font-size: 3vh;
+	color: black;
+}
+
+.textSent{
+	text-align: right;
+	margin-right: 1vh;
+	font-size: 3vh;
+	color: blue;
+}
+
+.textAlert{
+	text-align: center;
+	font-size: 3vh;
+	color: red;
 }
