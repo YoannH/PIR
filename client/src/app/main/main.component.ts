@@ -11,7 +11,8 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./main.component.scss']
 })
 export class MainComponent implements OnInit, OnDestroy {
-  
+
+
   @HostListener('document:keydown', ['$event']) onKeydown(event : KeyboardEvent){
     if(event.keyCode === 38 && !this.upPressed ){
       this.upPressed = true;
@@ -44,24 +45,36 @@ export class MainComponent implements OnInit, OnDestroy {
     }else if(event.keyCode === 32 && !this.spacePressed){
       this.spacePressed = true;
       this.socketService.sendKey('space');
-    }else if(event.keyCode === 49 && !this.onePressed){
+    }else if(event.keyCode === 87 && !this.onePressed){
       this.onePressed = true;
       this.socketService.sendKey('1');
-    }else if(event.keyCode === 50 && !this.twoPressed){
+    }else if(event.keyCode === 88 && !this.twoPressed){
       this.twoPressed = true;
       this.socketService.sendKey('2');
-    }else if(event.keyCode === 51 && !this.threePressed){
+    }else if(event.keyCode === 67 && !this.threePressed){
       this.threePressed = true;
       this.socketService.sendKey('3');
-    }else if(event.keyCode === 52 && !this.fourPressed){
+    }else if(event.keyCode === 86 && !this.fourPressed){
       this.fourPressed = true;
       this.socketService.sendKey('4');
-    }else if(event.keyCode === 53 && !this.fivePressed){
+    }else if(event.keyCode === 66 && !this.fivePressed){
       this.fivePressed = true;
       this.socketService.sendKey('5');
-    }else if(event.keyCode === 54 && !this.sixPressed){
+    }else if(event.keyCode === 78 && !this.sixPressed){
       this.sixPressed = true;
-      this.socketService.sendKey('six');
+      this.socketService.sendKey('6');
+    }else if(event.keyCode === 82 && !this.rPressed){
+      this.rPressed = true;
+      this.socketService.sendKey('rDown');
+    }else if(event.keyCode === 84 && !this.tPressed){
+      this.tPressed = true;
+      this.socketService.sendKey('tDown');
+    }else if(event.keyCode === 70 && !this.fPressed){
+      this.fPressed = true;
+      this.socketService.sendKey('fDown');
+    }else if(event.keyCode === 71 && !this.gPressed){
+      this.gPressed = true;
+      this.socketService.sendKey('gDown');
     }
     
     
@@ -90,18 +103,30 @@ export class MainComponent implements OnInit, OnDestroy {
       this.ePressed = false;    
     }else if(event.keyCode === 32){
       this.spacePressed = false;    
-    }else if(event.keyCode === 49){
+    }else if(event.keyCode === 87){
       this.onePressed = false;    
-    }else if(event.keyCode === 50){
+    }else if(event.keyCode === 88){
       this.twoPressed = false;    
-    }else if(event.keyCode === 51){
+    }else if(event.keyCode === 67){
       this.threePressed = false;    
-    }else if(event.keyCode === 52){
+    }else if(event.keyCode === 86){
       this.fourPressed = false;    
-    }else if(event.keyCode === 53){
+    }else if(event.keyCode === 66){
       this.fivePressed = false;    
-    }else if(event.keyCode === 54){
+    }else if(event.keyCode === 78){
       this.sixPressed = false;    
+    }else if(event.keyCode === 82 && this.rPressed){
+      this.rPressed = false;
+      this.socketService.sendKey('rUp');
+    }else if(event.keyCode === 84 && this.tPressed){
+      this.tPressed = false;
+      this.socketService.sendKey('tUp');
+    }else if(event.keyCode === 70 && this.fPressed){
+      this.fPressed = false;
+      this.socketService.sendKey('fUp');
+    }else if(event.keyCode === 71 && this.gPressed){
+      this.gPressed = false;
+      this.socketService.sendKey('gUp');
     }
   }
 
@@ -130,6 +155,10 @@ export class MainComponent implements OnInit, OnDestroy {
   fivePressed : boolean = false;
   sixPressed : boolean = false;
   spacePressed : boolean = false;
+  rPressed : boolean = false;
+  tPressed : boolean = false;
+  fPressed : boolean = false;
+  gPressed : boolean = false;
   propFromTop : number;
   propFromLeft : number;
   rotInRad : number;
@@ -187,6 +216,12 @@ export class MainComponent implements OnInit, OnDestroy {
 
   waterize : boolean = false;
 
+  messages : any = [];
+
+  inRange : boolean = false;
+
+  personnalScore : number = 0;
+
   batteryLevel : number = 100;
   treesLocationsSubscription : Subscription;
   zonesLocationsSubscription : Subscription;
@@ -194,62 +229,11 @@ export class MainComponent implements OnInit, OnDestroy {
   gameDataSubscription : Subscription;
   disconnectionSubscription : Subscription;
   waterThrowedSubscription : Subscription;
+  messagesSubscription : Subscription;
 
   constructor(private globalDatasService : GlobalDatasService, private socketService : SocketService, private router : Router) { }
 
   ngOnInit() {
-    // this.hotkeysService.add( new Hotkey( 'up', (event : KeyboardEvent) : boolean => {
-    //   // if(!this.upPressed){
-    //   //   console.log("up");
-    //   //   this.upPressed = true;
-    //   //   setTimeout(() => {
-    //   //     this.upPressed = false
-    //   //   }, 50);
-    //     this.socketService.sendKey('up');
-    //     return false;
-    //   //}      
-    // },
-    // undefined,
-    // 'forward' ));
-
-    // this.hotkeysService.add( new Hotkey( 'down', (event : KeyboardEvent) : boolean => {
-    //   // if(!this.downPressed){
-    //   //   this.downPressed = true;
-    //   //   setTimeout(() => {
-    //   //     this.downPressed = false
-    //   //   }, 50);
-    //     this.socketService.sendKey('down');
-    //     return false;
-    //  // }      
-    // },
-    // undefined,
-    // 'down' ));
-  
-    // this.hotkeysService.add( new Hotkey( 'right', (event : KeyboardEvent) : boolean => {
-    //   // if(!this.rightPressed){
-    //   //   this.rightPressed = true;
-    //   //   setTimeout(() => {
-    //   //     this.rightPressed = false
-    //   //   }, 50);
-    //     this.socketService.sendKey('right');
-    //     return false;
-    // //  }      
-    // },
-    // undefined,
-    // 'right' ));
-
-    // this.hotkeysService.add( new Hotkey( 'left', (event : KeyboardEvent) : boolean => {
-    //   // if(!this.leftPressed){
-    //   //   this.leftPressed = true;
-    //   //   setTimeout(() => {
-    //   //     this.leftPressed = false
-    //   //   }, 20);
-    //     this.socketService.sendKey('left');
-    //     return false;
-    //  // }      
-    // },
-    // undefined,
-    // 'down' ));
  
     this.treesLocationsSubscription = this.socketService.onTreesLocations().subscribe((trees) => {
       this.trees = trees;
@@ -272,6 +256,57 @@ export class MainComponent implements OnInit, OnDestroy {
       setTimeout(() => {
         this.waterize = false;
       }, 100);
+    });
+
+    this.messagesSubscription = this.socketService.onMessage().subscribe((data) => {
+      var messageStr ;
+      switch(data.id){
+        case 1: {
+          messageStr = "Please refill water tank";
+          break;
+        }
+        case 2: {
+          messageStr = "I'm going to refuel";
+          break;
+        }
+        case 3: {
+          messageStr = "Need water";
+          break;
+        }
+        case 4: {
+          messageStr = "Need electricity";
+          break;
+        }
+        case 5: {
+          messageStr = "Ok";
+          break;
+        }
+        case 6: {
+          messageStr = "No";
+          break;
+        }
+        case 7: {
+          messageStr = "Other player try to give water";
+          break;
+        }
+        case 8: {
+          messageStr = "Other player try to receive water";
+          break;
+        }
+        case 9: {
+          messageStr = "Other player try to give electricity";
+          break;
+        }
+        case 10: {
+          messageStr = "Other player try to receive electricity";
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+      this.messages.push({value : messageStr, status : data.status});
+      
     });
     
 
@@ -304,9 +339,11 @@ export class MainComponent implements OnInit, OnDestroy {
       this.watLevel = data.waterLevel;
       this.fires = data.fires;
       this.nbFighted = data.teamScore;
+      this.personnalScore = data.personnalScore;
       this.temperature = data.temperature;
     
       this.hotScreen = this.temperature/100;
+      this.inRange = data.inRange;
     });
   
     this.language = this.globalDatasService.language;
@@ -320,6 +357,8 @@ export class MainComponent implements OnInit, OnDestroy {
     this.zonesLocationsSubscription.unsubscribe();
     this.roleSubscription.unsubscribe();
     this.disconnectionSubscription.unsubscribe();
+    this.messagesSubscription.unsubscribe();
+    this.waterThrowedSubscription.unsubscribe()
   }
 
 
@@ -346,6 +385,10 @@ export class MainComponent implements OnInit, OnDestroy {
   killAll(){
     this.socketService.killAll();
     this.router.navigate(['/welcome']);
+  }
+
+  sendKey(key : string){
+    this.socketService.sendKey(key);
   }
 }
 

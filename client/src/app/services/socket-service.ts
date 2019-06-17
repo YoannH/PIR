@@ -129,15 +129,10 @@ export class SocketService {
         });       
     }
 
-    public onMessageSent(){
+    public onMessage(){
         return new Observable<any>( observer => {
-            this.socket.on('messageSent', (data) => {observer.next(data.id);});
+            this.socket.on('message', (data) => {observer.next(data);});
         });  
     }
 
-    public onMessageReceived(){
-        return new Observable<any>( observer => {
-            this.socket.on('messageReceived', (data) => {observer.next(data.id);});
-        });  
-    }
 }

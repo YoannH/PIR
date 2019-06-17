@@ -46,8 +46,12 @@
 				<div class="infonoff">	
 					<div class="missioninfo">
 						<div class="numbersinfo"> 
-							<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+							<i class="fa fa-users" aria-hidden="true"></i>
 							{{nbFighted}} 
+						</div> 
+						<div class="numbersinfo"> 
+							<i class="fa fa-user" aria-hidden="true"></i>
+							{{personnalScore}} 
 						</div> 
 						<div  class="numbersinfo"> <i class="fa fa-clock-o" aria-hidden="true"></i>   {{remainingTime}} </div>
 					</div>
@@ -268,17 +272,18 @@
 	<!-- Début de la partie coop de Benjamin -->
 
 	<div class="rightPart">
-		<div class="coopActions">
+		<div [ngClass]="{'coopActionsPlain' : inRange,
+						'coopActions' : !inRange}" >
 			<div class="exchangeRessources">
 				<div class="buttonletterChar">
-					<div class="exchangeButton" ng-class="{cursorPointer: !wrenchMode}">
+					<div class="exchangeButton" [ngClass]="{cursorPointer: !wrenchMode}" (mousedown)="sendKey('rDown')" (mouseup)="sendKey('rUp')">
 						<div class="sendWater" >
 						</div>
 					</div>
 					<div class="char"> r </div>
 				</div>
 				<div class="buttonletterChar">
-					<div class="exchangeButton" ng-class="{cursorPointer: !wrenchMode}">
+					<div class="exchangeButton" [ngClass]="{cursorPointer: !wrenchMode}" (mousedown)="sendKey('fDown')" (mouseup)="sendKey('fUp')">
 						<div class="sendElec">
 						</div>
 					</div>
@@ -287,14 +292,14 @@
 			</div>
 			<div class="exchangeRessources">
 				<div class="buttonletterChar">
-					<div class="exchangeButton" ng-class="{cursorPointer: !wrenchMode}">
+					<div class="exchangeButton" [ngClass]="{cursorPointer: !wrenchMode}" (mousedown)="sendKey('tDown')" (mouseup)="sendKey('tUp')">
 						<div class="receiveWater">
 						</div>
 					</div>
 					<div class="char"> t </div>
 				</div>
 				<div class="buttonletterChar">
-					<div class="exchangeButton" ng-class="{cursorPointer: !wrenchMode}">
+					<div class="exchangeButton" [ngClass]="{cursorPointer: !wrenchMode}" (mousedown)="sendKey('gDown')" (mouseup)="sendKey('gUp')">
 						<div class="receiveElec">
 						</div>
 					</div>
@@ -303,69 +308,40 @@
 			</div>
 		</div>
 		<div class="comms">
-			<button class="commButton1">
+			<button class="commButton1" (click)="sendKey('1')">
 				Please refill water tank
+				<div class="char"> w </div>
 			</button>
-			<button class="commButton1">
+			<button class="commButton1" (click)="sendKey('2')">
 				I'm going to refuel
+				<div class="char"> x </div>
 			</button>
-			<button class="commButton2">
+			<button class="commButton2" (click)="sendKey('3')">
 				Need water
+				<div class="char"> c </div>
 			</button>
-			<button class="commButton2">
+			<button class="commButton2" (click)="sendKey('4')">
 				Need electricity
+				<div class="char"> v </div>
 			</button>
-			<button class="commButton3">
+			<button class="commButton3" (click)="sendKey('5')">
 				Ok
+				<div class="char"> b </div>
 			</button>
-			<button class="commButton3">
+			<button class="commButton3" (click)="sendKey('6')">
 				No
+				<div class="char"> n </div>
 			</button>
 		</div>
-		<div class="chatbox" style="overflow-y:scroll;">
-			<div class="textReceived">
-				Need water
-			</div>
-			<div class="textReceived">
-				Need electricity
-			</div>
-			<div class="textSent">
-				Ok
-			</div>
-			<div class="textAlert">
-				Player 2 attempting to receive electricity
-			</div>
-			<div class="textAlert">
-				Player 2 attempting to receive water
-			</div>
-			<div class="textSent">
-				I'm going to refuel
-			</div>
-			<div class="textReceived">
-				Ok
-			</div>
-			<div class="textReceived">
-				Please fill water tank
-			</div>
-			<div class="textSent">
-				Ok
-			</div>
-			<div class="textAlert">
-				Message not sent
-			</div>
-			<div class="textSent">
-				Ok
-			</div>
-			<div class="textAlert">
-				Message not sent
-			</div>
-			<div class="textReceived">
-				Please fill water tank
-			</div>
-			<div class="textSent">
-				Ok
+		<div #chatbox class="chatbox" style="overflow-y:scroll;" [scrollTop]="chatbox.scrollHeight">
+			<div *ngFor="let message of messages" 
+				[ngClass]="{'textReceived': message.status =='textReceived',
+							'textSent' : message.status == 'textSent',
+							'textAlert' : message.status == 'textAlert'}">
+				{{message.value}}
 			</div>
 		</div>
 	</div>
 
 </div>
+

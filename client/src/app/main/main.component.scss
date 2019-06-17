@@ -2100,7 +2100,19 @@
 	align-items: center;
 }
 
+.coopActionsPlain{
+	opacity : 1;
+	display: flex;
+	justify-content:  space-around;
+	align-items: center;
+	height: 25%;
+	width: 95%;
+	border: solid #333 0.3vw;
+	border-radius: 1vw;
+}
+
 .coopActions{
+	opacity : 0.5;
 	display: flex;
 	justify-content:  space-around;
 	align-items: center;

@@ -248,6 +248,31 @@ io.on('connection', (socket) => {
 		else if(key == '6'){
 			sendMessage(6,data.token);
 		}
+		else if(key == 'rDown'){
+			trySendWater(data.token);
+		}
+		else if(key == 'tDown'){
+			tryReceiveWater(data.token);
+		}
+		else if(key == 'fDown'){
+			trySendBattery(data.token);
+		}
+		else if(key == 'gDown'){
+			tryReceiveBattery(data.token);
+		}
+		else if(key == 'rUp'){
+			playerData.givingWater = false;
+		}
+		else if(key == 'tUp'){
+			playerData.receivingWater = false;
+		}
+		else if(key == 'fUp'){
+			playerData.givingBattery = false;
+		}
+		else if(key == 'gUp'){
+			playerData.receivingWater = false;
+		}
+		
 
 	});
 
@@ -276,7 +301,8 @@ var baseIncrement = -2;
 var baseHeat = 20;
 var heatFactor = 1.5;
 var heatThreshold = 10;
-
+var inRange = false;
+var inRangeThreshold = 10;
 
 //Intervals
 var socketStates;
@@ -290,6 +316,8 @@ var leaksInterval;
 var batteryInterval;
 var treeBurningInterval;
 var temperatureInterval;
+var exchangeWaterInterval;
+var exchangeBatteryInterval;
 
 var isFinished;
 
@@ -341,7 +369,7 @@ function initGame(){
 	player1DatasToSend.water = water;	
 	player1Datas.battery = player1Datas.maxBatteryLevel;
 	player1Datas.noBattery = false;
-	player1Datas.inRange = false;
+	
 
 	player2DatasToSend.pos = player2Datas.pos;
 	player2DatasToSend.other = player1Datas.pos;
@@ -349,7 +377,7 @@ function initGame(){
 	player2DatasToSend.remainingTime = remainingTime;
 	player2Datas.battery = player2Datas.maxBatteryLevel;
 	player2Datas.noBattery = false;
-	player2Datas.inRange = false;
+	
 	
 
 	initWater();
@@ -524,7 +552,7 @@ function startGame(){
 			player1DatasToSend.batteryLevel = player1Datas.batteryLevel;
 			player1DatasToSend.noBattery = player1Datas.noBattery;
 			player1DatasToSend.remainingTime = remainingTime;
-			player1DatasToSend.inRange = player1Datas.inRange;
+			player1DatasToSend.inRange = inRange;
 			player1DatasToSend.teamScore = teamScore;
 			player1DatasToSend.personnalScore = player1Datas.personnalScore;
 			player1DatasToSend.temperature = player1Datas.temperature;
@@ -534,7 +562,7 @@ function startGame(){
 			player2DatasToSend.waterLevel = player2Datas.waterLevel/player2Datas.maxWaterLevel * 100;
 			player2DatasToSend.remainingTime = remainingTime;		
 			player2DatasToSend.noBattery = player2Datas.noBattery;
-			player2DatasToSend.inRange = player2Datas.inRange;
+			player2DatasToSend.inRange = inRange;
 			player2DatasToSend.teamScore = teamScore;
 			player2DatasToSend.personnalScore = player2Datas.personnalScore;
 			player2DatasToSend.temperature = player2Datas.temperature;
@@ -619,6 +647,20 @@ function initTanker(player){
 function dataProcessing(){
 	processPosition(player1Datas);
 	processPosition(player2Datas);
+	var player1Pos = { x : player1Datas.pos[0], y : player1Datas.pos[1] };
+	var player2Pos = { x : player2Datas.pos[0], y : player2Datas.pos[1] };
+	var inRange2 = distance(player1Pos, player2Pos) < inRangeThreshold;
+	if(inRange && !inRange2){
+		player1Datas.givingWater = false;
+		player1Datas.receivingWater = false;
+		player1Datas.givingBattery = false;
+		player1Datas.receivingBattery = false;
+		player2Datas.givingWater = false;
+		player2Datas.receivingWater = false;
+		player2Datas.givingBattery = false;
+		player2Datas.receivingBattery = false;
+	}
+	inRange = inRange2
 }
 
 function processPosition(player){
@@ -677,6 +719,9 @@ function processPosition(player){
 				if(player.waterLevel  < player.maxWaterLevel && water.waterLevelContainer >= 10 ){
 					player.waterLevel += 10;
 					water.waterLevelContainer -= 10
+					if(player.waterLevel > player.maxWaterLevel){
+						player.waterLevel = player.maxWaterLevel;
+					}
 				}
 			}else{
 				player.isRefillingWater = false;
@@ -787,14 +832,104 @@ function distance(point1, point2){
 
 function sendMessage(id, token){
 	if(token == player1){
-		socketNb1.emit("messageSent", {id : id});
-		socketNb2.emit("messageReceived", {id : id});
+		socketNb1.emit("message", {id : id, status : 'textSent'});
+		socketNb2.emit("message", {id : id, status : 'textReceived'});
 	}
 	else{
-		socketNb1.emit("messageReceived", {id : id});
-		socketNb2.emit("messageSent", {id : id});
+		socketNb1.emit("message", {id : id, status : 'textReceived'});
+		socketNb2.emit("message", {id : id, status : 'textSent'});
 	}
 }
+
+function trySendWater(token){
+	var giver = (token == player1) ? player1Datas : player2Datas;
+	var receiver = (token == player1) ? player2Datas : player1Datas;
+	var receiverSocket = (token == player1) ? socketNb2 : socketNb1;
+	if(inRange && giver.waterLevel > 0  && !giver.receivingWater ){
+		giver.givingWater = true;
+		if(receiver.receivingWater){
+			exchangeWaterInterval = setInterval( () => {
+				if(inRange && giver.waterLevel > 0 && giver.givingWater && receiver.receivingWater && receiver.waterLevel < receiver.maxWaterLevel){
+					giver.waterLevel -= 1;
+					receiver.waterLevel += 1;
+				}
+				else{
+					clearInterval(exchangeWaterInterval);
+				}
+			}, 100);
+		}else{
+			receiverSocket.emit("message", {id : 7, status : 'textAlert'});
+		}
+	}
+}
+
+function tryReceiveWater(token){
+	var giver = (token == player2) ? player1Datas : player2Datas;
+	var receiver = (token == player2) ? player2Datas : player1Datas;
+	var giverSocket = (token == player2) ? socketNb1 : socketNb1;
+	if(inRange && receiver.waterLevel < receiver.maxWaterLevel && !receiver.givingWater ){
+		receiver.receivingWater = true;
+		if(giver.givingWater){
+			exchangeWaterInterval = setInterval( () => {
+				if(inRange && giver.waterLevel > 0 && giver.givingWater && receiver.receivingWater && receiver.waterLevel < receiver.maxWaterLevel){
+					giver.waterLevel -= 1;
+					receiver.waterLevel += 1;
+				}
+				else{
+					clearInterval(exchangeWaterInterval);
+				}
+			}, 100);
+		}else{
+			giverSocket.emit("message", {id : 8, status : 'textAlert'});
+		}
+	}
+}
+
+function trySendBattery(token){
+	var giver = (token == player1) ? player1Datas : player2Datas;
+	var receiver = (token == player1) ? player2Datas : player1Datas;
+	var receiverSocket = (token == player1) ? socketNb2 : socketNb1;
+	if(inRange && giver.batteryLevel > 0 && !giver.receivingBattery){
+		giver.givingBattery = true;
+		if(receiver.receivingBattery){
+			exchangeBatteryInterval = setInterval( () => {
+				if(inRange && giver.batteryLevel> 0 && giver.givingBattery && receiver.receivingBattery && receiver.batteryLevel < receiver.maxBatteryLevel){
+					giver.batteryLevel -= 1;
+					receiver.batteryLevel += 1;
+				}
+				else{
+					clearInterval(exchangeBatteryInterval);
+				}
+			}, 100);
+		}else{
+			receiverSocket.emit("message", {id : 9, status : 'textAlert'});
+		}
+	}
+}
+
+function tryReceiveBattery(token){
+	var giver = (token == player2) ? player1Datas : player2Datas;
+	var receiver = (token == player2) ? player2Datas : player1Datas;
+	var giverSocket = (token == player2) ? socketNb2 : socketNb1;
+	if(inRange && giver.batteryLevel > 0 && receiver.batteryLevel < receiver.maxBatteryLevel && !receiver.givingBattery){
+		receiver.receivingBattery = true;
+		if(receiver.receivingBattery){
+			exchangeBatteryInterval = setInterval( () => {
+				if(inRange &&  giver.givingBattery && receiver.receivingBattery && receiver.batteryLevel < receiver.maxBatteryLevel){
+					giver.batteryLevel -= 1;
+					receiver.batteryLevel += 1;
+				}
+				else{
+					clearInterval(exchangeBatteryInterval);
+				}
+			}, 100);
+		}else{
+			giverSocket.emit("message", {id : 10, status : 'textAlert'});
+		}
+	}
+}
+
+
 
 function killAll(){
 	socketNb1.emit("disconnected", {});
@@ -813,6 +948,8 @@ function killAll(){
 	clearInterval(player1Datas.refillingBatteryInterval);
 	clearInterval(player2Datas.refillingBatteryInterval);
 	clearInterval(treeBurningInterval);
+	clearInterval(exchangeBatteryInterval);
+	clearInterval(exchangeWaterInterval);
 	remainingTime = 0;
 	nbPlayers = 0;
 	nbReadyPlayers = 0;
