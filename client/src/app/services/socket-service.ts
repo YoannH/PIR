@@ -8,10 +8,12 @@ import io from 'socket.io-client';
 @Injectable()
 export class SocketService {
     private socket : io;
-    public token : number;
+    public token : number = -1;
 
     public initSocket() : void {
-        this.socket = io("http://localhost:3000");    
+        if(this.token = -1){
+            this.socket = io("http://localhost:3000");
+        }    
     }
 
     public send(message : string, data : any) : void {
@@ -41,10 +43,14 @@ export class SocketService {
     public killAll() : void {
         this.socket.emit("killAll", { token : this.token});
     }
+
+    public getScores() : void {
+        this.socket.emit("getScores", {});
+    }
     //keys
 
     public clickLeak(key : number){
-        this.socket.emit("clickLeak", {key : key});
+        this.socket.emit("clickLeak", {key : key, token : this.token});
     }
 
     public sendKey(key : string){
@@ -147,4 +153,13 @@ export class SocketService {
         }); 
     }
 
+    public onScores(){
+        return new Observable<any>( observer => {
+            this.socket.on('scores', (data) => {observer.next(data.scores);});
+        }); 
+    }
+
+    public removeAlarm(){
+        this.socket.emit("removeAlarm", {token : this.token});
+    }
 }

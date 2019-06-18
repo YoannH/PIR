@@ -24,7 +24,7 @@ var socketNb1;
 var socketNb2;
 var player1Ready = false;
 var player2Ready = false;
-var token = 0;
+var globalToken = 0;
 var gameAvailable = true;
 var gameWillSoonStart = false;
 
@@ -34,20 +34,26 @@ server.listen(3000, () => {
 	console.log("Server listening on port 3000");
 });
 
-var cleanSocketArrayInterval = setInterval(() => {
-	socketsArray.forEach((element) => {
-		if(!element.socket.connected){
-			socketsArray.splice(element.token,1);
-		}
-	});
-}, 600000);
+// var cleanSocketArrayInterval = setInterval(() => {
+// 	socketsArray.forEach((element) => {
+// 		if(!element.socket.connected){
+// 			socketsArray.splice(element.token,1);
+// 		}
+// 	});
+// }, 600000);
 
 io.on('connection', (socket) => {
-	token += 1;
-	socket.emit("tokenResponse", {token : token});
-	socketsArray[token] = {socket : socket, status : 'connected', token : token} ;
+	globalToken += 1;
+	socket.emit("tokenResponse", {token : globalToken});
+	socketsArray[globalToken] = {socket : socket , token : globalToken} ;
 	socket.on("getRemainingTime", () => {
 		socket.emit("remainingTimeResponse", {remainingTime : remainingTime });
+	});
+
+	socket.on("getScores", (data) => {
+		var scoreChain = fs.readFileSync('scores.json', 'UTF-8');
+		var scores = JSON.parse(scoreChain);
+		socket.emit("scores", { scores : scores});
 	});
 
 	//traitement lors d'une requete pour jouer (redirection vers la page de chargement 
@@ -55,15 +61,15 @@ io.on('connection', (socket) => {
 	socket.on("getPlay", (data) => {
 		var token = data.token;
 		if(gameAvailable){
-			socketsArray[token].status = 'logged';
 			socket.emit("accessAuthorized", {});
 			
 			nbPlayers++;
 			if(nbPlayers === 1){
-				player1 = token;
+				player1 = data.token;
+				socketNb1 = socket;
 			}else{
 				//les 2 joueurs sont connectés dans l'écran de chargement
-				if(socketsArray[player1].socket.connected){
+				if(socketNb1.connected){
 					//on renseigne les autres connectés que le serveur est occupé
 					remainingTime = gameTime + waitingTime;
 					socketsArray.forEach((element) => {
@@ -71,9 +77,8 @@ io.on('connection', (socket) => {
 
 					});
 
-					player2 = token;
-					socketNb1 = socketsArray[player1].socket;
-					socketNb2 = socketsArray[player2].socket;
+					player2 = data.token;
+					socketNb2 = socket;
 					gameAvailable = false;
 					gameWillSoonStart = true;
 					player1Ready = false;
@@ -104,22 +109,19 @@ io.on('connection', (socket) => {
 								if(player1Ready){
 									socketNb1.emit("launchFailed", {waitingAgain : true});
 									socketNb2.emit("launchFailed", {waitingAgain : false});
-									socketsArray[player2].status = 'connected';
 									nbPlayers = 1;
 								}
 								else{
 									if(player2Ready){
 										socketNb1.emit("launchFailed", {waitingAgain : false});
-										socketsArray[player1].status = 'connected';
 										socketNb2.emit("launchFailed", {waitingAgain : true});
 										nbPlayers = 1;
 										player1 = player2;
+										socketNb1 = socketNb2;
 									}
 									else{
 										socketNb1.emit("launchFailed", {waitingAgain : false});
-										socketsArray[player1].status = 'connected';
 										socketNb2.emit("launchFailed", {waitingAgain : false});
-										socketsArray[player2].status = 'connected';
 										nbPlayers = 0;
 									}
 								}
@@ -128,9 +130,7 @@ io.on('connection', (socket) => {
 								remainingTime = 0;
 
 								socketsArray.forEach((element) => {
-									if(element.status === 'connected'){
-										element.socket.emit("remainingTimeResponse", {remainingTime : remainingTime});
-									}
+									element.socket.emit("remainingTimeResponse", {remainingTime : remainingTime});	
 								});
 
 							}
@@ -195,11 +195,21 @@ io.on('connection', (socket) => {
 	//key controls
 	socket.on('clickLeak', (data) => {
 		var playerDatas = player1Datas;
-		if(data.token == player2){
+		if(data.token === player2){
 			playerDatas = player2Datas;
 		}
 		var comma = (playerDatas.stringWriteClicks == "'") ? '' : ',';
-		playerDatas.stringWriteClicks += comma + 'clickLeak' + data.key;
+		playerDatas.stringWriteClicks += comma + 'clickLeak' + data.key.toString();
+		clickLeak(data.key);
+	});
+
+	socket.on('removeAlarm', (data) => {
+		var playerDatas = player1Datas;
+		if(data.token === player2){
+			playerDatas = player2Datas;
+		}
+		var comma = (playerDatas.stringWriteClicks == "'") ? '' : ',';
+		playerDatas.stringWriteClicks += comma + 'removeAlarm';
 		clickLeak(data.key);
 	});
 
@@ -459,7 +469,7 @@ function startGame(){
 		player2Datas.stringWriteClicks += "'";
 		player1Datas.stringWriteUsedKeys += "'";
 		player2Datas.stringWriteUsedKeys += "'";
-		wstream.write(remainingTime + ', ' + firesString() + ', ' + teamScore + ', ' + water.waterLevelContainer+ ', ' + leakPlacesString() + ', ' + player1Datas.personnalScore + ', ' + player1Datas.autonomousMode + ', ' + player1Datas.stringWriteAlarms + ', ' + player1Datas.pos[0] + ', ' + player1Datas.pos[1] + ', ' + player1Datas.pos[2] + ', ' + player1Datas.battery + ', ' + player1Datas.temperature + ', ' + player1Datas.waterLevel + ', ' + player1Datas.stringWriteUsedKeys + ', ' + player1Datas.stringWriteClicks + player2Datas.personnalScore + ', ' + player2Datas.autonomousMode + ', ' + player2Datas.stringWriteAlarms + ', ' + player2Datas.pos[0] + ', ' + player2Datas.pos[1] + ', ' + player2Datas.pos[2] + ', ' + player2Datas.battery + ', ' + player2Datas.temperature + ', ' + player2Datas.waterLevel + ', ' + player2Datas.stringWriteUsedKeys + ', ' + player2Datas.stringWriteClicks + '\n');
+		wstream.write(remainingTime + ', ' + firesString() + ', ' + teamScore + ', ' + water.waterLevelContainer+ ', ' + leakPlacesString() + ', ' + player1Datas.personnalScore + ', ' + player1Datas.autonomousMode + ', ' + player1Datas.stringWriteAlarms + ', ' + player1Datas.pos[0] + ', ' + player1Datas.pos[1] + ', ' + player1Datas.pos[2] + ', ' + player1Datas.battery + ', ' + player1Datas.temperature + ', ' + player1Datas.waterLevel + ', ' + player1Datas.stringWriteUsedKeys + ', ' + player1Datas.stringWriteClicks + ', ' + player2Datas.personnalScore + ', ' + player2Datas.autonomousMode + ', ' + player2Datas.stringWriteAlarms + ', ' + player2Datas.pos[0] + ', ' + player2Datas.pos[1] + ', ' + player2Datas.pos[2] + ', ' + player2Datas.battery + ', ' + player2Datas.temperature + ', ' + player2Datas.waterLevel + ', ' + player2Datas.stringWriteUsedKeys + ', ' + player2Datas.stringWriteClicks + '\n');
 		player1Datas.stringWriteAlarms = "'";
 		player2Datas.stringWriteAlarms = "'";
 		player1Datas.stringWriteClicks = "'";
@@ -816,16 +826,16 @@ function processPosition(player){
 	}
 	
 
-	if(!player.isRefillingBattery && player.pos[0] > zonesLocations.batteryZone.x && player.pos[0] < zonesLocations.batteryZone.x + 10 && player.pos[1] > zonesLocations.batteryZone.y && player.pos[1] < zonesLocations.batteryZone.y + 10){
+	if(!player.isRefillingBattery && player.pos[0] >= zonesLocations.batteryZone.x && player.pos[0] <= zonesLocations.batteryZone.x + 10 && player.pos[1] >= zonesLocations.batteryZone.y && player.pos[1] <= zonesLocations.batteryZone.y + 10){
 			player.isRefillingBattery = true;
 			player.refillingBatteryInterval = setInterval(() => {
-				if(player.isRefillingBattery && player.pos[0] > zonesLocations.batteryZone.x && player.pos[0] < zonesLocations.batteryZone.x + 10 && player.pos[1] > zonesLocations.batteryZone.y && player.pos[1] < zonesLocations.batteryZone.y + 10){
+				if(player.isRefillingBattery && player.pos[0] >= zonesLocations.batteryZone.x && player.pos[0] <= zonesLocations.batteryZone.x + 10 && player.pos[1] >= zonesLocations.batteryZone.y && player.pos[1] <= zonesLocations.batteryZone.y + 10){
 					if(player.battery/player.maxBatteryLevel*100 < 99 ){
 						player.battery += 1 * player.maxBatteryLevel/100;
 					}else{
 						player.battery = player.maxBatteryLevel;
 					}
-					if(player.ownBatteryAlarmSent){
+					if(player.battery > 20){
 						player.ownBatteryAlarmSent = false;
 					}
 				}else{
@@ -834,10 +844,10 @@ function processPosition(player){
 				}
 			}, 50);
 	}
-	if(!player.isRefillingWater && player.pos[0] > zonesLocations.waterZone.x && player.pos[0] < zonesLocations.waterZone.x + 10 && player.pos[1] > zonesLocations.waterZone.y && player.pos[1] < zonesLocations.waterZone.y + 10){
+	if(!player.isRefillingWater && player.pos[0] >= zonesLocations.waterZone.x && player.pos[0] <= zonesLocations.waterZone.x + 10 && player.pos[1] >= zonesLocations.waterZone.y && player.pos[1] <= zonesLocations.waterZone.y + 10){
 		player.isRefillingWater = true;
 		player.refillingWaterInterval = setInterval(() => {
-			if(player.isRefillingWater && player.pos[0] > zonesLocations.waterZone.x && player.pos[0] < zonesLocations.waterZone.x + 10 && player.pos[1] > zonesLocations.waterZone.y && player.pos[1] < zonesLocations.waterZone.y + 10){
+			if(player.isRefillingWater && player.pos[0] >= zonesLocations.waterZone.x && player.pos[0] <= zonesLocations.waterZone.x + 10 && player.pos[1] >= zonesLocations.waterZone.y && player.pos[1] <= zonesLocations.waterZone.y + 10){
 				if(player.waterLevel  < player.maxWaterLevel && water.waterLevelContainer >= 10 ){
 					player.waterLevel += 10;
 					water.waterLevelContainer -= 10
@@ -1168,7 +1178,7 @@ function saveScore(){
 
     var rank = 0;
     
-    while(rank<scores.length && scores[rank].globalScore >= teamScore){
+    while(rank<scores.length && scores[rank].score >= teamScore){
       rank++;
     }
     

@@ -15,17 +15,18 @@
 			<i class="fa fa-thermometer-full" aria-hidden="true"></i> 
 		</div>
 		<div class="numextfires"> 
-			<div class="fireicon"> </div> 
 			<i class="fa fa-users" aria-hidden="true"></i> 
-			<span>The team extinguished {{nbFighted}} fires </span> 	
+			<div class='firetext'>The team extinguished {{nbFighted}} fires </div> 
+			<div class="fireicon"> </div> 	
 		</div>
 		<div class="numextfires"> 
-			<div class="fireicon"> </div> 
+			
 			<i class="fa fa-user" aria-hidden="true"></i> 
-			<span>You personnaly extinguished {{personnalScore}} fires </span> 	
+			<div class="firetext">You personnaly extinguished {{personnalScore}} fires </div> 
+			<div class="fireicon"> </div> 	
 		</div>
 		<div class="newbestscore" *ngIf="newBestScore"> 
-			<span> NEW BEST SCORE! Good job </span> <span style="color: #05BDFF">{{pseudo1}} & {{pseudo2}}</span> <span>!</span>
+			<span> NEW BEST SCORE! Good job  </span> <span style="color: #05BDFF">{{pseudo1}} & {{pseudo2}}</span> <span>!</span>
 		</div>
 		<div [routerLink]="['/welcome']" class="gohome"> 
 			<i class="fa fa-reply" aria-hidden="true"></i> 
@@ -47,11 +48,9 @@
 	<div class="leftPart">  
 		<div class="missionBlock">
 			<div class="maincontainermission">
-				<div class="iconCircle">
-					<i class="fa fa-trophy" aria-hidden="true"></i>
-				</div>
-				<div class="gametitle">
-					Firefighter Human-Robot Team <div class="fireicon"> </div>
+
+				<div class="role">
+					Role : {{role}}
 				</div>
 				<div class="infonoff">	
 					<div class="missioninfo">
@@ -76,7 +75,7 @@
 				<div class="iconCircle">
 					<i class="fa fa-tint" aria-hidden="true"></i>
 				</div>
-	                        <div class="robinetcontainer">
+	            <div class="robinetcontainer">
 					<div class="robinet" [ngStyle]="{left: xRobinet+2+'%', bottom: yRobinet/1.8 + 42 +'%'}"> 
 					</div>
 					<div class="wheel" *ngIf="direction!=0" [ngClass]="{wheelinverse: direction<0}"  [ngStyle]="{left: xRobinet+7.9+'%', bottom: yRobinet/1.8+58+'%', 'animation-duration': animTime + 's'}"> 
@@ -169,7 +168,9 @@
 								<!-- <i class="fa fa-circle-thin" [ngStyle]="{top: propFromTop - 10 + '%', left: propFromLeft -10 +  '%',  position: absolute, color:red}" aria-hidden="true"></i> -->
 								<div class="pointcontainer" [ngStyle]="{top: propFromTop  -4 + '%', left: propFromLeft - 4  +  '%', transform: 'rotate('+ rotInRad +'rad)'}">
 								<div class="point"></div></div>
-								<div class="other" [ngStyle]="{top: otherPropFromTop -1.5 + '%', left: otherPropFromLeft -1.5  +  '%', transform: 'rotate('+ otherRotInRad +'rad)'}">
+								<div class="otherContainer" [ngStyle]="{top: otherPropFromTop -2.5 + '%', left: otherPropFromLeft -2.5  +  '%', transform: 'rotate('+ otherRotInRad +'rad)'}">
+									<div class="other">
+									</div>
 								</div>
 								<div class = "treeContainer" *ngFor="let value of trees; let key = index" [ngStyle]="{top: value.y - 5 +'%', left: value.x -5 + '%'}">
 								<div class="tree" >
@@ -205,13 +206,26 @@
 		</div>
 		<div class="infoBlock"> 
 			<div class="maincontainer">
+
+				
 				<div class="iconCircle">
 					<i class="fa fa-info" aria-hidden="true"></i>
 				</div>
-				<div class="iconscontents">
+				<div class="iconscontents1">
 					<div class="linktoicon">
-						<i class="fa fa-globe" aria-hidden="true"></i>
+						<i class="fa fa-comments" aria-hidden="true" style="color : white;"></i>
 					</div>
+					<div class="maincontainersec2">
+					<div #chatbox class="chatbox" style="overflow-y:scroll;" [scrollTop]="chatbox.scrollHeight">
+							<div *ngFor="let message of messages" 
+								[ngClass]="{'textReceived': message.status =='textReceived',
+											'textSent' : message.status == 'textSent',
+											'textAlert' : message.status == 'textAlert'}">
+								{{message.value}}
+							</div>
+						</div>
+					</div>
+
 					
 
 
@@ -343,14 +357,7 @@
 				<div class="char"> n </div>
 			</button>
 		</div>
-		<div #chatbox class="chatbox" style="overflow-y:scroll;" [scrollTop]="chatbox.scrollHeight">
-			<div *ngFor="let message of messages" 
-				[ngClass]="{'textReceived': message.status =='textReceived',
-							'textSent' : message.status == 'textSent',
-							'textAlert' : message.status == 'textAlert'}">
-				{{message.value}}
-			</div>
-		</div>
+
 	</div>
 
 </div>

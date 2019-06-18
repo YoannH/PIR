@@ -11,6 +11,9 @@ import { Subscription } from 'rxjs';
 })
 export class LoadingComponent implements OnInit, OnDestroy {
 
+  @HostListener('window:popstate', ['$event'])  onPopState(event) {
+    this.globalDatasService.popState = true;
+  }
 
   @Input() pseudo : string = '';
   anotherPlayer : boolean =false;
@@ -27,6 +30,9 @@ export class LoadingComponent implements OnInit, OnDestroy {
   constructor(private globalDatasService : GlobalDatasService, private socketService : SocketService, private router : Router) { }
 
   ngOnInit() {
+    if(this.globalDatasService.popState){
+      window.location.reload();
+    }
     this.language = this.globalDatasService.language;
 
     this.initDotTimer();
@@ -53,10 +59,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
       }
     });
 
-    if(this.globalDatasService.popState){
-      this.globalDatasService.popState = false;
-      this.router.navigate(['/welcome']);
-      }
+
   }
 
   ngOnDestroy() {

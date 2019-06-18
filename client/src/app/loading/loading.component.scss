@@ -38,7 +38,7 @@
 }
 
 .watermanagementLoading{
-	width: 40vw;
+	width: 30vw;
 	height: 60vh;
 	font-size: 1.7vw;
 	display: flex;
@@ -100,4 +100,16 @@
 	height: 0%;
 	cursor: pointer;
 	color: white;
+}
+.cooperationBlock{
+	width: 30vw;
+	height: 60vh;
+	font-size: 1.7vw;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	border-radius: 10%;
+	border: solid white 0.3vw;
+	padding-left: 1vw;
+	padding-right: 1vw;
 }

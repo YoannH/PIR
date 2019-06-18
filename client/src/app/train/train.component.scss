@@ -33,7 +33,7 @@
 }
 
 .watermngttrain{
-	width: 35vw;
+	width: 30vw;
 	height: 95%;
 }
 
@@ -48,7 +48,7 @@
 }
 
 .robotcommandstrain{
-	width: 30vw;
+	width: 25vw;
 	height: 95%;
 }
 
@@ -94,6 +94,18 @@
 	cursor: pointer;
 }
 
+.cooperationBlock{
+	width: 25vw;
+	height: 80%;
+	font-size: 1.7vw;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	border-radius: 5%;
+	border: solid white 0.3vw;
+	padding-left: 1vw;
+	padding-right: 1vw;
+}
 .videoOrGoback{
 	display: flex;
 	flex-direction: column;

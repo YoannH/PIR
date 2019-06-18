@@ -131,9 +131,11 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   @HostListener('window:popstate', ['$event'])  onPopState(event) {
-    this.socketService.killAll();
     this.globalDatasService.popState = true;
   }
+
+  
+
   
   
   language : string;
@@ -243,6 +245,10 @@ export class MainComponent implements OnInit, OnDestroy {
   constructor(private globalDatasService : GlobalDatasService, private socketService : SocketService, private router : Router) { }
 
   ngOnInit() {
+
+    if(this.globalDatasService.popState){
+      window.location.reload();
+    }
  
     this.treesLocationsSubscription = this.socketService.onTreesLocations().subscribe((trees) => {
       this.trees = trees;
@@ -420,6 +426,7 @@ export class MainComponent implements OnInit, OnDestroy {
   removeAlarm(){
     this.alarmId = 0;
     this.alarmOverlayOpen = false;
+    this.socketService.removeAlarm();
   }
 }
 

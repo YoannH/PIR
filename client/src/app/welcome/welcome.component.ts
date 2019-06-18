@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { GlobalDatasService } from '../services/global-datas.service';
 import { Router } from '@angular/router';
 import { SocketService } from '../services/socket-service';
@@ -10,6 +10,10 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./welcome.component.scss']
 })
 export class WelcomeComponent implements OnInit, OnDestroy {
+
+  @HostListener('window:popstate', ['$event'])  onPopState(event) {
+    this.globalDatasService.popState = true;
+  }
 
   repeater : NodeJS.Timer;
   emptySlot : boolean;
@@ -25,6 +29,9 @@ export class WelcomeComponent implements OnInit, OnDestroy {
   constructor(private globalDatasService : GlobalDatasService, private socketService : SocketService, private router : Router) {}
 
   ngOnInit() {
+    if(this.globalDatasService.popState){
+      window.location.reload();
+    }
     this.language = this.globalDatasService.language;
     if(!this.globalDatasService.isAuth){
       this.socketService.initSocket();
@@ -86,6 +93,7 @@ export class WelcomeComponent implements OnInit, OnDestroy {
 
   changeLanguage(language : string){
     this.globalDatasService.changeLanguage(language);
+    this.language = this.globalDatasService.language;
   }
 
 }

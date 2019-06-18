@@ -94,22 +94,25 @@
 }
 
 .gameover{
-    font-size: 7vw;
-    color: white;
+    font-size: 5vw;
+		color: white;
+		text-align:  center;
 }
 
 .whyover{
 	font-size: 3vw;
 	color: white;
-	width: 30vw;
+	width: 70vw;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
 
 .textcause{
+	width : 50%;
 	margin-right: 2vw;
 	margin-left: 2vw;
+	text-align: center;
 }
 
 .textthx{
@@ -117,14 +120,21 @@
         color: white;
 }
 
+.firetext {
+	width : 60%;
+	margin-right: 2vw;
+	margin-left: 2vw;
+	text-align: center;
+}
 .numextfires{
-	margin-top: 5vw;
+	margin-top: 4vw;
 	font-size: 3vw;
 	color: white;
 	display: flex;
+	flex-direction: row;
 	align-items: center;
 	justify-content: space-between;
-	width: 37vw;
+	width: 60vw;
 }
 
 .newbestscore{
@@ -134,7 +144,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 70vw;
+	width: 90vw;
 }
 
 .newbestscore input{
@@ -189,7 +199,7 @@
 }
 
 .leftPart{
-	width: 35%;
+	width: 30%;
 	height: 100%;
 	display: flex;
 	flex-direction: column;
@@ -221,7 +231,7 @@
 
 
 .centerPart{
-	width: 65%;
+	width: 50%;
 	height: 100%;
 /*	background-color: green;*/
 	/*margin: 1%;*/
@@ -298,6 +308,18 @@
 	width: 100%;
 }
 
+.linktoicon1{
+	background-color: white;
+	width: 20%;
+	height: 5vw;
+	margin-bottom: 2.5vw;
+	border-top-left-radius: 3vw;	
+	border-bottom-left-radius: 3vw;
+	display: flex;
+	align-items: center;
+	margin-left: 0.2vw;
+}
+
 .linktoicon{
 	background-color: #333;
 	width: 20%;
@@ -332,6 +354,16 @@
 	height: 30vh;
 }
 
+.iconscontents1 {
+	display: flex;
+	align-items: flex-end;
+/*	background-color: red;*/
+	width: 60%;
+}
+
+.iconscontents1 i{
+	color: #333;
+}
 
 .iconscontents i{
 	color: white;
@@ -366,7 +398,7 @@
 	display: flex;
 	align-items: center;
 	color: white;
-	justify-content: space-around;
+	align-self: flex-start;
 	width: 70%;
 }
 
@@ -378,14 +410,23 @@
 
 .infonoff{
 	display: flex;
+	flex-direction: row;
 	align-items: center;
 	color: white;
-	justify-content: space-between;
-	width: 80%;
+	align-content: space-between;
+	width: 100%;
 }
 
 .onoff{
+	display: flex;
+	flex-direction: row;
 	cursor: pointer;
+	width: 30%;
+	align-self: flex-end;
+	align-content: right;
+	justify-items: right;
+	justify-content: right;
+	
 }
 
 .streamcamera{
@@ -468,9 +509,10 @@
 }
 
 .numbersinfo{
-	font-size: 3vw;
+	font-size: 2.5vw;
 	color: white;
 	display: flex;
+	text-align: center;
 }
 
 .infoBlock i{
@@ -765,6 +807,7 @@
 	position : absolute;
 	width: 8%;
 	height: 8%;
+	z-index : 11;
 }
 .point{
 	background-image: url("/assets/images/arrow.png");
@@ -777,17 +820,27 @@
 	
 	z-index: auto;
 }
+.otherContainer{
+	position: absolute;
+	/*top: 10%;
+	left: 30%;*/
+	width: 5%;
+	height: 5%;
+	background-size: 5% 5%;
+	z-index : 10;
+
+}
 
 .other{
 	background-image: url("/assets/images/arrow.png");
 	position: absolute;
 	/*top: 10%;
 	left: 30%;*/
-	width: 3%;
-	height: 3%;
-	background-size: 3% 3%;
+	width: 100%;
+	height: 100%;
+	background-size: 100% 100%;
 	color : blue;
-	z-index: 10;	
+	z-index: auto;	
 }
 
 .treeContainer{
@@ -1398,14 +1451,14 @@
 
 .montainAxis{
 	background-image: url("/assets/images/montain.png");
-	height: 10vh;
-	width: 28vw;
-	background-size: 28vw 10vh;
+	height: 11%;
+	width: 80%;
+	background-size: 100% 100%;
 	/*height: 50%;
 	width: 100%;
 	background-size: 100% 50%;*/
-	left: 2.8vw;
-	top: 5vh;
+	left: 10%;
+	top: 6%;
 	position: absolute;
 }
 
@@ -1695,7 +1748,7 @@
 }
 
 .neckcontainer{
-	width: 5vw;
+	width: 15%;
 	height: 4.5vh;
 	background-color: #4F849E;
 	border-left: solid 0.5vw #909090;
@@ -1707,7 +1760,7 @@
 }
 
 .tankcontainer{
-	width: 20vw;
+	width: 69%;
 	height: 40vh;
 /*	background-color: white;*/
 	position: absolute;
@@ -2214,8 +2267,8 @@
 	display: flex;
 	flex-direction: column;
 	background-color: white;
-	height: 30%;
-	width: 95%;
+	height: 100%;
+	width: 100%;
 	border: solid #333 0.3vw;
 	border-radius: 1vw;
 	font-size: 1.5vw;
