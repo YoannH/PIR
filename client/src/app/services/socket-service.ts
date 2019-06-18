@@ -30,8 +30,8 @@ export class SocketService {
         this.socket.emit("getPlay", { token : this.token });
     }
 
-    public sendReady() : void {
-        this.socket.emit("ready", { token : this.token });
+    public sendReady(pseudo : string) : void {
+        this.socket.emit("ready", { token : this.token, pseudo : pseudo });
     }
 
     public readyToPlay() : void {
@@ -133,6 +133,18 @@ export class SocketService {
         return new Observable<any>( observer => {
             this.socket.on('message', (data) => {observer.next(data);});
         });  
+    }
+
+    public onAlarm(){
+        return new Observable<any>( observer => {
+            this.socket.on('alarm', (data) => {observer.next(data.id);});
+        }); 
+    }
+
+    public onGameOver(){
+        return new Observable<any>( observer => {
+            this.socket.on('gameOver', (data) => {observer.next(data);});
+        }); 
     }
 
 }

@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 export class LoadingComponent implements OnInit, OnDestroy {
 
 
-  @Input() pseudo : string;
+  @Input() pseudo : string = '';
   anotherPlayer : boolean =false;
   language : string;
   waitingTime : number;
@@ -67,7 +67,7 @@ export class LoadingComponent implements OnInit, OnDestroy {
   }
 
   ready(){
-    this.socketService.sendReady();
+    this.socketService.sendReady(this.pseudo);
     this.isReady = true;
   }
 

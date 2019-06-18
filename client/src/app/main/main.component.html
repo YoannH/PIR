@@ -1,38 +1,48 @@
 <div class="screen" [ngClass]="{screenWrench: wrenchMode}" >
-	<!-- <div [ngClass]="{overlayOpen: overlayOpen}" class="overlay">
-		<div class="gameover" *ngIf="cause==1 || cause==2"> GAME OVER! </div>
-                <div class="gameover" *ngIf="cause==0"> THE END </div>
-                <div class="textthx" *ngIf="cause==0"> Mission completed, CONGRATULATION! </div>
-		<div class="whyover" *ngIf="cause==1"> 
+	<div [ngClass]="{overlayOpen: overlayOpen}" class="overlay">
+		<div class="gameover" *ngIf="gameOverCause==3 || gameOverCause==4"> GAME OVER! </div>
+        <div class="gameover" *ngIf="gameOverCause==1"> THE END </div>
+		<div class="textthx" *ngIf="gameOverCause==1"> Mission completed, CONGRATULATION! </div>
+		<div class="gameover" *ngIf="gameOverCause==2"> THE OTHER PLAYER DISCONNECTED </div>
+		<div class="whyover" *ngIf="gameOverCause==3"> 
 			<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> 
-			<div class="textcause"> Battery empty </div> 
+			<div class="textcause"> Batteries empty </div> 
 			<i class="fa fa-battery-empty" aria-hidden="true"></i> 
 		</div>
-		<div class="whyover" *ngIf="cause==2"> 
+		<div class="whyover" *ngIf="gameOverCause==4"> 
 			<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> 
-			<div class="textcause"> Overheat </div> 
+			<div class="textcause"> One player overheated </div> 
 			<i class="fa fa-thermometer-full" aria-hidden="true"></i> 
 		</div>
 		<div class="numextfires"> 
 			<div class="fireicon"> </div> 
-			<span> {{finalnumfires}} extinguished fires </span> 
-			<i class="fa fa-thumbs-o-up" aria-hidden="true"></i> 
+			<i class="fa fa-users" aria-hidden="true"></i> 
+			<span>The team extinguished {{nbFighted}} fires </span> 	
+		</div>
+		<div class="numextfires"> 
+			<div class="fireicon"> </div> 
+			<i class="fa fa-user" aria-hidden="true"></i> 
+			<span>You personnaly extinguished {{personnalScore}} fires </span> 	
 		</div>
 		<div class="newbestscore" *ngIf="newBestScore"> 
-			<span> NEW BEST SCORE! Good job </span> <span style="color: #05BDFF">&nbsp;{{winnerPseudo}}</span> <span>!</span>
+			<span> NEW BEST SCORE! Good job </span> <span style="color: #05BDFF">{{pseudo1}} & {{pseudo2}}</span> <span>!</span>
 		</div>
-		<div (click)="gohome()" ui-sref="welcome" class="gohome"> 
+		<div [routerLink]="['/welcome']" class="gohome"> 
 			<i class="fa fa-reply" aria-hidden="true"></i> 
 			<span> back to main menu </span> 
 		</div>
-	</div>  -->
+	</div> 
 
 
-	<!-- <div [ngClass]="{overlayOpen: alarmOverlayOpen}" class="alarmOverlay">
+	<div [ngClass]="{overlayOpen: alarmOverlayOpen && !overlayOpen}" class="alarmOverlay">
 		<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> 
-		<span class="textAlarm"> {{alarmText[alarmCause]}} ! </span>
+		<span class="textAlarm" *ngIf="alarmId==1"> Low water (less than 2 shots)!! </span>
+		<span class="textAlarm" *ngIf="alarmId==2"> Your battery is low!! </span>
+		<span class="textAlarm" *ngIf="alarmId==3"> The other player has no battery anymore!! </span>
+		<span class="textAlarm" *ngIf="alarmId==4"> Your temperature is high!! </span>
+		<span class="textAlarm" *ngIf="alarmId==5"> Only 30s left!! </span>
 		<div class="alarmButton" (click)="removeAlarm()"> I got it </div>	
-	</div> -->
+	</div> 
 
 	<div class="leftPart">  
 		<div class="missionBlock">

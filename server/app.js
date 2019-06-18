@@ -9,8 +9,11 @@ var io = require('socket.io')(server);
 
 
 
+
 //VARIABLES
-var gameTime = 300;
+var date;
+var wstream;
+var gameTime = 600;
 var waitingTime = 15;
 var remainingTime = 0;
 var nbPlayers = 0;
@@ -25,20 +28,24 @@ var token = 0;
 var gameAvailable = true;
 var gameWillSoonStart = false;
 
-var upTimeout;
-var downTimeout;
-var leftTimeout;
-var rightTimeout;
 
 var nbPlayersLogged = 0;
 server.listen(3000, () => {
 	console.log("Server listening on port 3000");
 });
 
+var cleanSocketArrayInterval = setInterval(() => {
+	socketsArray.forEach((element) => {
+		if(!element.socket.connected){
+			socketsArray.splice(element.token,1);
+		}
+	});
+}, 600000);
+
 io.on('connection', (socket) => {
 	token += 1;
 	socket.emit("tokenResponse", {token : token});
-	socketsArray[token] = {socket : socket, status : 'connected'} ;
+	socketsArray[token] = {socket : socket, status : 'connected', token : token} ;
 	socket.on("getRemainingTime", () => {
 		socket.emit("remainingTimeResponse", {remainingTime : remainingTime });
 	});
@@ -60,9 +67,8 @@ io.on('connection', (socket) => {
 					//on renseigne les autres connectés que le serveur est occupé
 					remainingTime = gameTime + waitingTime;
 					socketsArray.forEach((element) => {
-						if(element.status == 'connected'){
-							element.socket.emit("remainingTimeResponse", {remainingTime : remainingTime});
-						}
+						element.socket.emit("remainingTimeResponse", {remainingTime : remainingTime});
+
 					});
 
 					player2 = token;
@@ -75,6 +81,8 @@ io.on('connection', (socket) => {
 					waitingTime = 15;
 					
 					nbReadyPlayers = 0;
+					pseudo1 = '';
+					pseudo2 = '';
 					//on lance un timer de 15 secondes : les joueurs doivent cliquer sur un bouton
 					//avant la fin pour lancer la partie, ceux qui ne le font pas sont redirigés 
 					//en dehors de l'écran de chargement
@@ -153,8 +161,18 @@ io.on('connection', (socket) => {
 		var playerNumber = 0
 		if(token === player1){
 			playerNumber = 1;
+			if(data.pseudo){
+				pseudo1 = data.pseudo;
+			}else{
+				pseudo1 = "anonym";
+			}
 		}else if(token === player2){
 			playerNumber = 2;
+			if(data.pseudo){
+				pseudo2 = data.pseudo;
+			}else{
+				pseudo2 = "anonym";
+			}
 		}
 		if(gameWillSoonStart && (playerNumber != 0)){
 			if(playerNumber === 1 && !player1Ready){
@@ -171,11 +189,17 @@ io.on('connection', (socket) => {
 	});
 
 	socket.on("killAll", (data) => {
-		killAll();
+		finishGame(2);
 	});
 
 	//key controls
 	socket.on('clickLeak', (data) => {
+		var playerDatas = player1Datas;
+		if(data.token == player2){
+			playerDatas = player2Datas;
+		}
+		var comma = (playerDatas.stringWriteClicks == "'") ? '' : ',';
+		playerDatas.stringWriteClicks += comma + 'clickLeak' + data.key;
 		clickLeak(data.key);
 	});
 
@@ -187,28 +211,31 @@ io.on('connection', (socket) => {
 			playerData = player2Datas;
 		}
 		var key = data.key;
-		if(key == 'updown'){
+		var comma = (playerData.stringWriteUsedKeys == "'") ? '' : ',';
+		playerData.stringWriteUsedKeys += comma + data.key;
+
+		if(key == 'upDown'){
 			playerData.direction = 1;
 		}
-		else if(key == 'upup'){
+		else if(key == 'upUp'){
 			playerData.direction = 0;
 		}
-		else if(key =='downdown'){
+		else if(key =='downDown'){
 			playerData.direction = -1;
 		}
-		else if(key =='downup'){
+		else if(key =='downUp'){
 			playerData.direction = 0;
 		}
-		else if(key =='rightdown'){
+		else if(key =='rightDown'){
 			playerData.rotDirection = 1;
 		}
-		else if(key =='rightup'){
+		else if(key =='rightUp'){
 			playerData.rotDirection = 0;
 		}
-		else if(key =='leftdown'){
+		else if(key =='leftDown'){
 			playerData.rotDirection = -1;
 		}
-		else if(key =='leftup'){
+		else if(key =='leftUp'){
 			playerData.rotDirection = 0;
 		}
 		else if(key == 'a'){
@@ -279,6 +306,8 @@ io.on('connection', (socket) => {
 });
 
 //GAME DATA
+var pseudo1 ;
+var pseudo2;
 
 var player1Datas ;
 var player2Datas ;
@@ -322,6 +351,7 @@ var exchangeBatteryInterval;
 var isFinished;
 
 var teamScore;
+var newBestScore;
 
 
 
@@ -331,13 +361,13 @@ var teamScore;
 
 
 function initGame(){
-
 	socketStates = setInterval( () => {
 		if(!socketNb1.connected || !socketNb2.connected){
-			killAll();
+			finishGame(2);
 		}
 	}, 1000);
 	teamScore = 0;
+	newBestScore = false;
 	player1Datas = {};
 	player2Datas = {};
 	player1DatasToSend = {};
@@ -349,17 +379,22 @@ function initGame(){
 		player1Role = 'tanker';
 		socketNb1.emit('role', 'tanker');
 		initTanker(player1Datas);
-
+		player2Role = 'speeder';
 		socketNb2.emit('role', 'speeder');
 		initSpeeder(player2Datas);
 	}else{
 		player1Role = 'speeder';
 		socketNb1.emit('role', 'speeder');
 		initSpeeder(player1Datas);
+		player2Role ='tanker';
 		socketNb2.emit('role', 'tanker');
 		initTanker(player2Datas);
 	}
 
+	date = new Date();
+	wstream = fs.createWriteStream('records/record_' + date.getFullYear() + '_' + ('0' + (date.getMonth()+1)).slice(-2) + '_' + ('0' + date.getDate()).slice(-2) + '__' + ('0' + date.getHours()).slice(-2) + '_' + ('0' + date.getMinutes()).slice(-2) + '.txt');
+	wstream.write('#robot1 : ' + player1Role + ', robot2 : ' + player2Role + '\n');
+	wstream.write('# remaining_time, trees_state, global_score, ground_tank_water_level, leaks, personnal_score1, autonomous1, alarms1, robot1_x, robot1_y, robot1_theta, robot1_battery, robot1_temperature, robot1_waterlevel, robot1_shortkeys, robot1_clicks, personnal_score2, autonomous2, alarms2, robot2_x, robot2_y, robot2_theta, robot2_battery, robot2_temperature, robot2_waterlevel, robot2_shortkeys, robot2_clicks  \n');
 
 	isFinished = false;
 	remainingTime = 600;
@@ -369,6 +404,7 @@ function initGame(){
 	player1DatasToSend.water = water;	
 	player1Datas.battery = player1Datas.maxBatteryLevel;
 	player1Datas.noBattery = false;
+	player1Datas.autonomousMode = 0;
 	
 
 	player2DatasToSend.pos = player2Datas.pos;
@@ -377,6 +413,15 @@ function initGame(){
 	player2DatasToSend.remainingTime = remainingTime;
 	player2Datas.battery = player2Datas.maxBatteryLevel;
 	player2Datas.noBattery = false;
+	player2Datas.autonomousMode = 0;
+
+
+	player1Datas.stringWriteAlarms = "'";
+	player2Datas.stringWriteAlarms = "'";
+	player1Datas.stringWriteClicks = "'";
+	player2Datas.stringWriteClicks = "'";
+	player1Datas.stringWriteUsedKeys = "'";
+	player2Datas.stringWriteUsedKeys = "'";
 	
 	
 
@@ -407,6 +452,21 @@ function startGame(){
 	socketNb2.emit("zones", {zones : zonesLocations});
 	socketNb2.emit("role", { role : player2Datas.role});
 
+	writeDatasInterval = setInterval(() => {
+		player1Datas.stringWriteAlarms += "'";
+		player2Datas.stringWriteAlarms += "'";
+		player1Datas.stringWriteClicks += "'";
+		player2Datas.stringWriteClicks += "'";
+		player1Datas.stringWriteUsedKeys += "'";
+		player2Datas.stringWriteUsedKeys += "'";
+		wstream.write(remainingTime + ', ' + firesString() + ', ' + teamScore + ', ' + water.waterLevelContainer+ ', ' + leakPlacesString() + ', ' + player1Datas.personnalScore + ', ' + player1Datas.autonomousMode + ', ' + player1Datas.stringWriteAlarms + ', ' + player1Datas.pos[0] + ', ' + player1Datas.pos[1] + ', ' + player1Datas.pos[2] + ', ' + player1Datas.battery + ', ' + player1Datas.temperature + ', ' + player1Datas.waterLevel + ', ' + player1Datas.stringWriteUsedKeys + ', ' + player1Datas.stringWriteClicks + player2Datas.personnalScore + ', ' + player2Datas.autonomousMode + ', ' + player2Datas.stringWriteAlarms + ', ' + player2Datas.pos[0] + ', ' + player2Datas.pos[1] + ', ' + player2Datas.pos[2] + ', ' + player2Datas.battery + ', ' + player2Datas.temperature + ', ' + player2Datas.waterLevel + ', ' + player2Datas.stringWriteUsedKeys + ', ' + player2Datas.stringWriteClicks + '\n');
+		player1Datas.stringWriteAlarms = "'";
+		player2Datas.stringWriteAlarms = "'";
+		player1Datas.stringWriteClicks = "'";
+		player2Datas.stringWriteClicks = "'";
+		player1Datas.stringWriteUsedKeys = "'";
+		player2Datas.stringWriteUsedKeys = "'";
+	}, 1000);
 
 	calculateData = setInterval(() => {
 		if(!isFinished){
@@ -494,25 +554,75 @@ function startGame(){
 		if(player2Datas.temperature < 0){
 			player2Datas.temperature = 0;
 		}
+		if(player1Datas.temperature >= 70 && !player1Datas.temperatureAlarmSent){
+			player1Datas.temperatureAlarmSent = true;
+			var comma = (player1Datas.stringWriteAlarms == "'") ? '' : ',';
+			player1Datas.stringWriteAlarms += comma + '4';
+			socketNb1.emit("alarm", {id : 4});
+		}
+		if(player2Datas.temperature >= 70 && !player2Datas.temperatureAlarmSent){
+			player2Datas.temperatureAlarmSent = true;
+			var comma = (player2Datas.stringWriteAlarms == "'") ? '' : ',';
+			player2Datas.stringWriteAlarms += comma + '4';
+			socketNb2.emit("alarm", {id : 4});
+		}
+		if(player1Datas.temperature < 70 && player1Datas.temperatureAlarmSent){
+			player1Datas.temperatureAlarmSent = false;
+		}
+		if(player2Datas.temperature < 70 && player2Datas.temperatureAlarmSent){
+			player2Datas.temperatureAlarmSent = true;
+		}
+		if(player1Datas.temperature >= 100 || player2Datas.temperature >= 100){
+			finishGame(4);
+		}
 		
 	}, 1000);
 
 	batteryInterval = setInterval(() => {
 		if(player1Datas.battery > 0){
+			player2Datas.otherBatteryAlarmSent = false;
 			player1Datas.battery--;
 			if(player1Datas.noBattery){
 				player1Datas.noBattery = false;
 			}
+			if(!player1Datas.ownBatteryAlarmSent && player1Datas.battery <= 20){
+				var comma = (player1Datas.stringWriteAlarms == "'") ? '' : ',';
+				player1Datas.stringWriteAlarms += comma + '2';
+				player1Datas.ownBatteryAlarmSent = true;
+				socketNb1.emit("alarm", {id : 2});
+			}
 		}else{
 			player1Datas.noBattery = true;
+			if(!player2Datas.otherBatteryAlarmSent){
+				var comma = (player2Datas.stringWriteAlarms == "'") ? '' : ',';
+				player2Datas.stringWriteAlarms += comma + '3';
+				player2Datas.otherBatteryAlarmSent = true;
+				socketNb2.emit("alarm", {id : 3});
+			}
 		}
 		if(player2Datas.battery > 0){
+			player1Datas.otherBatteryAlarmSent = false;
 			if(player2Datas.noBattery){
 				player2Datas.noBattery = false;
 			}
 			player2Datas.battery--;
+			if(!player2Datas.ownBatteryAlarmSent && player2Datas.battery <= 20){
+				var comma = (player2Datas.stringWriteAlarms == "'") ? '' : ',';
+				player2Datas.stringWriteAlarms += comma + '2';
+				player2Datas.ownBatteryAlarmSent = true;
+				socketNb2.emit("alarm", {id : 2});
+			}
 		}else{
 			player2Datas.noBattery = true;
+			if(!player1Datas.otherBatteryAlarmSent){
+				var comma = (player1Datas.stringWriteAlarms == "'") ? '' : ',';
+				player1Datas.stringWriteAlarms += comma + '3';
+				player1Datas.otherBatteryAlarmSent = true;
+				socketNb1.emit("alarm", {id : 3});
+			}
+		}
+		if(player1Datas.noBattery && player2Datas.noBattery){
+			finishGame(3);
 		}
 	},1000);
 
@@ -538,8 +648,17 @@ function startGame(){
 	timer = setInterval(() => {
 		if(!isFinished && remainingTime > 0){
 			remainingTime--;
+			if(remainingTime == 30){
+				var comma = (player1Datas.stringWriteAlarms == "'") ? '' : ',';
+				player1Datas.stringWriteAlarms += comma + '5';
+				comma = (player2Datas.stringWriteAlarms == "'") ? '' : ',';
+				player2Datas.stringWriteAlarms += comma + '5';
+				socketNb1.emit("alarm", {id : 5});
+				socketNb2.emit("alarm", {id : 5});
+			}
 		}else{
-			clearInterval(timer);
+			isFinished = true;
+			finishGame(1);
 		}
 	}, 1000);
 
@@ -706,6 +825,9 @@ function processPosition(player){
 					}else{
 						player.battery = player.maxBatteryLevel;
 					}
+					if(player.ownBatteryAlarmSent){
+						player.ownBatteryAlarmSent = false;
+					}
 				}else{
 					player.isRefillingBattery = false;
 					clearInterval(player.refillingBatteryInterval);
@@ -722,6 +844,10 @@ function processPosition(player){
 					if(player.waterLevel > player.maxWaterLevel){
 						player.waterLevel = player.maxWaterLevel;
 					}
+					if(player.waterLevel >= 21){
+						player.waterAlarmSent = false;
+					}
+					
 				}
 			}else{
 				player.isRefillingWater = false;
@@ -788,6 +914,12 @@ function throwWater(player, socket){
 		player.waterLevel -= 10;
 		socket.emit("waterThrowed", {});
 		waterThrowed = true;
+		if(player.waterLevel <= 20 && !player.waterAlarmSent){
+			var comma = (player.stringWriteAlarms == "'") ? '' : ',';
+			player.stringWriteAlarms += comma + '1';
+			socket.emit("alarm", {id : 1})
+			player.waterAlarmSent = true;
+		}
 	}
 	if(waterThrowed){
 		var treeExtinguished = false;
@@ -852,6 +984,22 @@ function trySendWater(token){
 				if(inRange && giver.waterLevel > 0 && giver.givingWater && receiver.receivingWater && receiver.waterLevel < receiver.maxWaterLevel){
 					giver.waterLevel -= 1;
 					receiver.waterLevel += 1;
+					if(receiver.waterAlarmSent && receiver.waterLevel > 20 ){
+						receiver.waterAlarmSent = false;
+					}
+					if(!giver.waterAlarmSent && giver.waterLevel <= 20 ){
+						giver.waterAlarmSent = true;
+						if(token == player1){
+							var comma = (player1Datas.stringWriteAlarms == "'") ? '' : ',';
+							player1Datas.stringWriteAlarms += comma + '1';
+							socketNb1.emit("alarm", {id : 1});
+						}
+						else{
+							var comma = (player2Datas.stringWriteAlarms == "'") ? '' : ',';
+							player2Datas.stringWriteAlarms += comma + '1';
+							socketNb2.emit("alarm", {id : 1});
+						}
+					}
 				}
 				else{
 					clearInterval(exchangeWaterInterval);
@@ -874,6 +1022,22 @@ function tryReceiveWater(token){
 				if(inRange && giver.waterLevel > 0 && giver.givingWater && receiver.receivingWater && receiver.waterLevel < receiver.maxWaterLevel){
 					giver.waterLevel -= 1;
 					receiver.waterLevel += 1;
+					if(receiver.waterAlarmSent && receiver.waterLevel > 20 ){
+						receiver.waterAlarmSent = false;
+					}
+					if(!giver.waterAlarmSent && giver.waterLevel <= 20 ){
+						giver.waterAlarmSent = true;
+						if(token == player1){
+							var comma = (player2Datas.stringWriteAlarms == "'") ? '' : ',';
+							player2Datas.stringWriteAlarms += comma + '1';
+							socketNb2.emit("alarm", {id : 1});
+						}
+						else{
+							var comma = (player1Datas.stringWriteAlarms == "'") ? '' : ',';
+							player1Datas.stringWriteAlarms += comma + '1';
+							socketNb1.emit("alarm", {id : 1});
+						}
+					}
 				}
 				else{
 					clearInterval(exchangeWaterInterval);
@@ -889,13 +1053,29 @@ function trySendBattery(token){
 	var giver = (token == player1) ? player1Datas : player2Datas;
 	var receiver = (token == player1) ? player2Datas : player1Datas;
 	var receiverSocket = (token == player1) ? socketNb2 : socketNb1;
-	if(inRange && giver.batteryLevel > 0 && !giver.receivingBattery){
+	if(inRange && giver.battery > 0 && !giver.receivingBattery){
 		giver.givingBattery = true;
 		if(receiver.receivingBattery){
 			exchangeBatteryInterval = setInterval( () => {
-				if(inRange && giver.batteryLevel> 0 && giver.givingBattery && receiver.receivingBattery && receiver.batteryLevel < receiver.maxBatteryLevel){
-					giver.batteryLevel -= 1;
-					receiver.batteryLevel += 1;
+				if(inRange && giver.battery > 0 && giver.givingBattery && receiver.receivingBattery && receiver.batteryLevel < receiver.maxBatteryLevel){
+					giver.battery -= 1;
+					receiver.battery += 1;
+					if(receiver.ownBatteryAlarmSent && receiver.battery > 20 ){
+						receiver.ownBatteryAlarmSent = false;
+					}
+					if(!giver.ownBatteryAlarmSent && giver.battery <= 20 ){
+						giver.ownBatteryAlarmSent = true;
+						if(token == player1){
+							var comma = (player1Datas.stringWriteAlarms == "'") ? '' : ',';
+							player1Datas.stringWriteAlarms += comma + '2';
+							socketNb1.emit("alarm", {id : 2});
+						}
+						else{
+							var comma = (player2Datas.stringWriteAlarms == "'") ? '' : ',';
+							player2Datas.stringWriteAlarms += comma + '2';
+							socketNb2.emit("alarm", {id : 2});
+						}
+					}
 				}
 				else{
 					clearInterval(exchangeBatteryInterval);
@@ -911,13 +1091,29 @@ function tryReceiveBattery(token){
 	var giver = (token == player2) ? player1Datas : player2Datas;
 	var receiver = (token == player2) ? player2Datas : player1Datas;
 	var giverSocket = (token == player2) ? socketNb2 : socketNb1;
-	if(inRange && giver.batteryLevel > 0 && receiver.batteryLevel < receiver.maxBatteryLevel && !receiver.givingBattery){
+	if(inRange && giver.battery > 0 && receiver.batteryLevel < receiver.maxBatteryLevel && !receiver.givingBattery){
 		receiver.receivingBattery = true;
 		if(receiver.receivingBattery){
 			exchangeBatteryInterval = setInterval( () => {
 				if(inRange &&  giver.givingBattery && receiver.receivingBattery && receiver.batteryLevel < receiver.maxBatteryLevel){
-					giver.batteryLevel -= 1;
-					receiver.batteryLevel += 1;
+					giver.battery -= 1;
+					receiver.battery += 1;
+					if(receiver.ownBatteryAlarmSent && receiver.battery > 20 ){
+						receiver.ownBatteryAlarmSent = false;
+					}
+					if(!giver.ownBatteryAlarmSent && giver.battery <= 20 ){
+						giver.ownBatteryAlarmSent = true;
+						if(token == player1){
+							var comma = (player2Datas.stringWriteAlarms == "'") ? '' : ',';
+							player2Datas.stringWriteAlarms += comma + '2';
+							socketNb2.emit("alarm", {id : 2});
+						}
+						else{
+							var comma = (player1Datas.stringWriteAlarms == "'") ? '' : ',';
+							player1Datas.stringWriteAlarms += comma + '2';
+							socketNb1.emit("alarm", {id : 2});
+						}
+					}
 				}
 				else{
 					clearInterval(exchangeBatteryInterval);
@@ -932,8 +1128,6 @@ function tryReceiveBattery(token){
 
 
 function killAll(){
-	socketNb1.emit("disconnected", {});
-	socketNb2.emit("disconnected", {});
 	isFinished = true;
 	clearInterval(temperatureInterval);
 	clearInterval(socketStates);
@@ -950,6 +1144,8 @@ function killAll(){
 	clearInterval(treeBurningInterval);
 	clearInterval(exchangeBatteryInterval);
 	clearInterval(exchangeWaterInterval);
+	wstream.end();
+	clearInterval(writeDatasInterval);
 	remainingTime = 0;
 	nbPlayers = 0;
 	nbReadyPlayers = 0;
@@ -964,3 +1160,75 @@ function killAll(){
 
 }
 
+function saveScore(){
+	if (teamScore>0){
+
+    var scoreChain = fs.readFileSync('scores.json', 'UTF-8');
+    var scores = JSON.parse(scoreChain);
+
+    var rank = 0;
+    
+    while(rank<scores.length && scores[rank].globalScore >= teamScore){
+      rank++;
+    }
+    
+    if(rank<10){
+      newBestScore = true;
+    }
+
+
+    var scoreDate = new Date();
+    var MyDateString = ('0' + (scoreDate.getMonth()+1)).slice(-2) + '/'
+             + ('0' + scoreDate.getDate()).slice(-2) + '/'
+             + scoreDate.getFullYear();
+    var newDate =  MyDateString + ', ' + ('0' + scoreDate.getHours()).slice(-2) + ':' + ( '0' + scoreDate.getMinutes()).slice(-2);
+    var newObject = { pseudo1 : pseudo1, score1 : player1Datas.personnalScore, pseudo2 : pseudo2, score2 : player2Datas.personnalScore, score : teamScore, date : newDate };
+    
+    if(scores.length==rank){
+      scores.push(newObject);
+    }else{ 
+      var lastObject = scores[scores.length-1];
+      scores.push(lastObject);
+      for(var i=scores.length-1; i>rank; i--){
+        scores[i].pseudo1 = scores[i-1].pseudo1;
+				scores[i].score1 = scores[i-1].score1;
+				scores[i].pseudo2 = scores[i-1].pseudo2;
+        scores[i].score2 = scores[i-1].score2;
+        scores[i].date = scores[i-1].date;
+        scores[i].score = scores[i-1].score;
+      }
+      scores[rank] = newObject;
+    }
+    var newScoreChaine = JSON.stringify(scores);
+    fs.writeFileSync('scores.json', newScoreChaine, 'UTF-8');
+  }
+}
+
+function finishGame(id){
+	saveScore();
+	socketNb1.emit("gameOver", {id : id, teamScore : teamScore, personnalScore : player1Datas.personnalScore, newBestScore : newBestScore, pseudo1 : pseudo1, pseudo2 : pseudo2});
+	socketNb2.emit("gameOver", {id : id, teamScore : teamScore, personnalScore : player2Datas.personnalScore, newBestScore : newBestScore, pseudo1 : pseudo2, pseudo2 : pseudo1});
+	killAll();
+		
+	}
+
+
+function firesString(){
+	var myString = "'";
+	var l = firesStatesOfTrees.length;
+	for(var i = 0; i < l-1; i++ ){
+		myString += firesStatesOfTrees[i].toString() + ',';
+	}
+	myString += firesStatesOfTrees[l-1].toString() + "'";
+	return myString;
+}
+
+function leakPlacesString(){
+	var myString = "'";
+	var l = water.noLeakAt.length;
+	for(var i = 0; i < l-1; i++ ){
+		myString += water.noLeakAt[i].toString() + ',';
+	}
+	myString += water.noLeakAt[l-1].toString() + "'";
+	return myString;
+}

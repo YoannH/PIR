@@ -17,19 +17,19 @@ export class MainComponent implements OnInit, OnDestroy {
     if(event.keyCode === 38 && !this.upPressed ){
       this.upPressed = true;
       this.downPressed = false;
-      this.socketService.sendKey('updown');
+      this.socketService.sendKey('upDown');
     }else if(event.keyCode === 40 && !this.downPressed){
       this.downPressed = true;
       this.upPressed = false;
-      this.socketService.sendKey('downdown');
+      this.socketService.sendKey('downDown');
     }else if(event.keyCode === 37 && !this.leftPressed){
       this.leftPressed = true;
       this.rightPressed = false;
-      this.socketService.sendKey('leftdown');
+      this.socketService.sendKey('leftDown');
     }else if(event.keyCode === 39 && !this.rightPressed){
       this.rightPressed = true;
       this.leftPressed = false;
-      this.socketService.sendKey('rightdown');
+      this.socketService.sendKey('rightDown');
     }else if(event.keyCode === 65 && !this.aPressed){
       this.aPressed = true;
       this.socketService.sendKey('a');
@@ -83,16 +83,16 @@ export class MainComponent implements OnInit, OnDestroy {
   @HostListener('document:keyup', ['$event']) onKeyup(event : KeyboardEvent){
     if(event.keyCode === 38 && this.upPressed){
       this.upPressed = false;
-      this.socketService.sendKey('upup');
+      this.socketService.sendKey('upUp');
     }else if(event.keyCode === 40 && this.downPressed){
       this.downPressed = false;
-      this.socketService.sendKey('downup');
+      this.socketService.sendKey('downUp');
     }else if(event.keyCode === 37 && this.leftPressed){
       this.leftPressed = false;
-      this.socketService.sendKey('leftup');
+      this.socketService.sendKey('leftUp');
     }else if(event.keyCode === 39 && this.rightPressed){
       this.rightPressed = false;
-      this.socketService.sendKey('rightup');
+      this.socketService.sendKey('rightUp');
     }else if(event.keyCode === 65){
       this.aPressed = false;    
     }else if(event.keyCode === 83){
@@ -204,7 +204,8 @@ export class MainComponent implements OnInit, OnDestroy {
   remainingTime : number = 600;
   temperature : number = 0;
   hotScreen : number = 0;
-
+  alarmId : number = 0;
+  
   role : string ;
   trees : any;
   zones : any = { batteryZone : { x : 0, y : 0},
@@ -221,6 +222,12 @@ export class MainComponent implements OnInit, OnDestroy {
   inRange : boolean = false;
 
   personnalScore : number = 0;
+  gameOverCause : number = 0;
+  newBestScore : boolean = false;
+  overlayOpen : boolean = false;
+
+  pseudo1 : string = '';
+  pseudo2 : string = '';
 
   batteryLevel : number = 100;
   treesLocationsSubscription : Subscription;
@@ -230,6 +237,8 @@ export class MainComponent implements OnInit, OnDestroy {
   disconnectionSubscription : Subscription;
   waterThrowedSubscription : Subscription;
   messagesSubscription : Subscription;
+  alarmsSubscription : Subscription;
+  gameOverSubscription : Subscription;
 
   constructor(private globalDatasService : GlobalDatasService, private socketService : SocketService, private router : Router) { }
 
@@ -256,6 +265,11 @@ export class MainComponent implements OnInit, OnDestroy {
       setTimeout(() => {
         this.waterize = false;
       }, 100);
+    });
+
+    this.alarmsSubscription = this.socketService.onAlarm().subscribe((id) => {
+      this.alarmId = id;
+      this.alarmOverlayOpen = true;
     });
 
     this.messagesSubscription = this.socketService.onMessage().subscribe((data) => {
@@ -308,6 +322,16 @@ export class MainComponent implements OnInit, OnDestroy {
       this.messages.push({value : messageStr, status : data.status});
       
     });
+
+    this.gameOverSubscription = this.socketService.onGameOver().subscribe( (data) => {
+        this.gameOverCause = data.id;
+        this.nbFighted = data.teamScore;
+        this.personnalScore = data.personnalScore;
+        this.newBestScore = data.newBestScore;
+        this.pseudo1 = data.pseudo1;
+        this.pseudo2 = data.pseudo2;
+        this.overlayOpen = true;
+    });
     
 
     this.gameDataSubscription = this.socketService.onGameData().subscribe((data)=>{
@@ -358,7 +382,9 @@ export class MainComponent implements OnInit, OnDestroy {
     this.roleSubscription.unsubscribe();
     this.disconnectionSubscription.unsubscribe();
     this.messagesSubscription.unsubscribe();
-    this.waterThrowedSubscription.unsubscribe()
+    this.waterThrowedSubscription.unsubscribe();
+    this.alarmsSubscription.unsubscribe();
+    this.gameOverSubscription.unsubscribe();
   }
 
 
@@ -389,6 +415,11 @@ export class MainComponent implements OnInit, OnDestroy {
 
   sendKey(key : string){
     this.socketService.sendKey(key);
+  }
+
+  removeAlarm(){
+    this.alarmId = 0;
+    this.alarmOverlayOpen = false;
   }
 }
 
