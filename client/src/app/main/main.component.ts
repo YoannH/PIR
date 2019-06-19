@@ -282,19 +282,23 @@ export class MainComponent implements OnInit, OnDestroy {
       var messageStr ;
       switch(data.id){
         case 1: {
-          messageStr = "Please refill water tank";
+          if (this.language=='english') {messageStr = "Please refill water tank"}
+          else if (this.language=='french') {messageStr = "Remplis le réservoir"};
           break;
         }
         case 2: {
-          messageStr = "I'm going to refuel";
+          if (this.language=='english') {messageStr = "I'm going to refuel"}
+          else if (this.language=='french') {messageStr = "Je vais recharger"};
           break;
         }
         case 3: {
-          messageStr = "Need water";
+          if (this.language=='english') {messageStr = "Need water"}
+          else if (this.language=='french') {messageStr = "J'ai besoin d'eau"};
           break;
         }
         case 4: {
-          messageStr = "Need electricity";
+          if (this.language=='english') {messageStr = "Need electricity"}
+          else if (this.language=='french') {messageStr = "J'ai besoin de de batterie"};
           break;
         }
         case 5: {
@@ -302,23 +306,28 @@ export class MainComponent implements OnInit, OnDestroy {
           break;
         }
         case 6: {
-          messageStr = "No";
+          if (this.language=='english') {messageStr = "No"}
+          else if (this.language=='french') {messageStr = "Non"};
           break;
         }
         case 7: {
-          messageStr = "Other player try to give water";
+          if (this.language=='english') {messageStr = "Other player try to give water"}
+          else if (this.language=='french') {messageStr = "L'autre joueur veut partager son eau"};
           break;
         }
         case 8: {
-          messageStr = "Other player try to receive water";
+          if (this.language=='english') {messageStr = "Other player try to receive water"}
+          else if (this.language=='french') {messageStr = "L'autre joueur veut recevoir de l'eau"};
           break;
         }
         case 9: {
-          messageStr = "Other player try to give electricity";
+          if (this.language=='english') {messageStr = "Other player try to give electricity"}
+          else if (this.language=='french') {messageStr = "L'autre joueur veut partager sa batterie"};
           break;
         }
         case 10: {
-          messageStr = "Other player try to receive electricity";
+          if (this.language=='english') {messageStr = "Other player try to receive electricity"}
+          else if (this.language=='french') {messageStr = "L'autre joueur veut recevoir de la batterie"};
           break;
         }
         default: {
