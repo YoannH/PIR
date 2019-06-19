@@ -329,7 +329,7 @@ var treesLocations;
 var zonesLocations;
 
 
-var timeStep = 0.04;
+var timeStep = 0.02;
 var leakPlacesNb = 9;
 var collidingThreshold = 3;
 var extinguishThreshold = 10;
@@ -344,7 +344,6 @@ var probaAutonomous = 0.5;
 var probaStopAutonomous = 0.6;
 var autonomousExtinguishThreshold = 8;
 var autonomousCollidingThreshold = 5;
-var cap ;
 var autonomousCapThreshold = 0.1;
 var autonomousScalarProdThreshold = 0.7;
 
@@ -493,7 +492,7 @@ function startGame(){
 		}else{
 			clearInterval(calculateData);
 		}
-	}, 40);
+	}, 20);
 
 	waterManagementInterval = setInterval(() => {
 		if((water.xRobinet <= 80) && (water.xRobinet >= 0)) {
@@ -681,6 +680,8 @@ function startGame(){
 		}
 	}, 1000);
 
+	player1Datas.autonomousInterval = setInterval(() => {autonomousFunction(player1Datas);}, 10000);
+	player2Datas.autonomousInterval = setInterval(() => {autonomousFunction(player2Datas);}, 10000);
 
 	sendData = setInterval(() => {
 		if(!isFinished){
@@ -694,6 +695,7 @@ function startGame(){
 			player1DatasToSend.teamScore = teamScore;
 			player1DatasToSend.personnalScore = player1Datas.personnalScore;
 			player1DatasToSend.temperature = player1Datas.temperature;
+			player1DatasToSend.autonomousMode = player1Datas.autonomousMode;
 
 			player2Datas.batteryLevel = player2Datas.battery/player2Datas.maxBatteryLevel *100;
 			player2DatasToSend.batteryLevel = player2Datas.batteryLevel;
@@ -704,6 +706,7 @@ function startGame(){
 			player2DatasToSend.teamScore = teamScore;
 			player2DatasToSend.personnalScore = player2Datas.personnalScore;
 			player2DatasToSend.temperature = player2Datas.temperature;
+			player2DatasToSend.autonomousMode = player2Datas.autonomousMode;
 
 			socketNb1.emit("gameData", player1DatasToSend);
 			socketNb2.emit("gameData", player2DatasToSend);
@@ -1255,26 +1258,34 @@ function leakPlacesString(){
 
 
 function autonomousFunction(player){
+	var cap;
 	var p = Math.random();
 	//test d'activation du mode autonome
 	if(p > probaAutonomous && !player.previouslyAutonomous && !player.autonomousMode){
 		player.autonomousMode = true;
 		player.previouslyAutonomous = true;
+		player.rotDirection = 0;
+		player.direction = 0;
 	}
 
 	//interval d'arrêt aléatoire ou quand t° trop haute
 
 	player.stopAutonomousInterval = setInterval( () => {
+	
 		var p2 = Math.random();
 		if(p2 > probaStopAutonomous || player.temperature >= 80){
+
 			player.autonomousMode = false;
 			player.autonomousTimeout = setTimeout( () => {
 				player.previouslyAutonomous = false;
 			}, 10000);
 			clearInterval(player.stopAutonomousInterval);
 			clearInterval(player.autonomousDecisionsInterval);
+			player.rotDirection = 0;
+			player.direction = 0;
+		
 		}
-	}, 4000);
+	}, 80000);
 
 	player.hasAGoal = false;
 	player.autonomousNextStep = 'computeNextGoal';
@@ -1311,16 +1322,17 @@ function autonomousFunction(player){
 				if(cap - player.pos[2] > Math.PI ){
 					player.rotDirection = 1;
 				}else{
-					player.rotDirection -= 1;
+					player.rotDirection = -1;
 				}
 			}
 		}
-		if(player.autonomousNextStep == 'orienting' && Math.abs(cap - player.pos[2]) < autonomousCapThreshold ){
+		if(player.autonomousNextStep == 'orienting' && Math.abs(Math.atan2(player.nextPos.y - playerPos.y, player.nextPos.x - playerPos.x) - player.pos[2]) < autonomousCapThreshold ){
 				player.autonomousNextStep = 'approach';
+				console.log('coucou');
 				player.rotDirection = 0;
 				player.direction =1;
 		}
-		if(player.autonomousNextStep = 'approach' && distance(playerPos, player.nextPos) < player.autonomousDistanceThreshold){
+		if(player.autonomousNextStep == 'approach' && distance(playerPos, player.nextPos) < player.autonomousDistanceThreshold){
 			player.direction = 0;
 			if(player.nextGoal == 'battery'){
 				if(player.maxBatteryLevel - player.battery < 5){
@@ -1361,17 +1373,23 @@ function autonomousFunction(player){
 			var diffY = (player.avoidingTree.y - playerPos.y)/distanceToTree;
 			var robotoX = Math.cos(player.pos[2]);
 			var robotoY = Math.sin(player.pos[2]);
-		  if(scalarProduct({x : diffX, y: diffY}, {x : robotoX, y : robotoY}) < autonomousScalarProdThreshold){
-				player.autonomousNextStep = 'orienting';
-				cap = Math.atan2(player.nextPos.y - playerPos.y, player.nextPos.x - playerPos.x);
-				if(cap - player.pos[2] > Math.PI ){
-					player.rotDirection = 1;
-				}else{
-					player.rotDirection -= 1;
-				}
+		  if(scalarProduct({x : diffX, y: diffY}, {x : robotoX, y : robotoY}) > autonomousScalarProdThreshold){
+				player.rotDirection = 0;
+				player.direction = 1;
+				player.autonomousNextStep == 'avoiding2';
+				setTimeout(() => {
+					player.direction = 0;
+					player.autonomousNextStep = 'orienting';
+					cap = Math.atan2(player.nextPos.y - playerPos.y, player.nextPos.x - playerPos.x);
+					if(cap - player.pos[2] > Math.PI ){
+						player.rotDirection = 1;
+					}else{
+						player.rotDirection -= 1;
+					}
+				}, 500);			
 			}
 		}
-	}, 40);
+	}, 20);
 	
 }
 
