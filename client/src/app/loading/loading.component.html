@@ -6,8 +6,8 @@
 		<span *ngIf="language=='french'"> EN ATTENTE D'UN AUTRE JOUEUR <span *ngIf="dot>0">.</span><span *ngIf="dot>1">.</span><span *ngIf="dot>2">.</span></span>
 	</div>
     <div class="loading" *ngIf="anotherPlayer">
-		<span style="color: #05BDFF" *ngIf="language=='english'"> ANOTHER PLAYER HAS BEEN FOUND. <br>THE GAME WILL START IN {{waitingTime || 15}}S! </span>
-		<span style="color: #05BDFF" *ngIf="language=='french'"> UN AUTRE JOUEUR A ETE TROUVE. <br>LE JEU COMMENCERA DANS  {{waitingTime || 15}}S! </span>
+		<span style="color: #05BDFF" *ngIf="language=='english'"> ANOTHER PLAYER HAS BEEN FOUND. <br>THE GAME WILL START IN {{waitingTime || 0}}S! </span>
+		<span style="color: #05BDFF" *ngIf="language=='french'"> UN AUTRE JOUEUR A ETE TROUVE. <br>LE JEU COMMENCERA DANS  {{waitingTime || 0}}S! </span>
 		<div class="mainButton" *ngIf="!isReady && language=='english'" (click)="ready()">Click this button to play within {{waitingTime}}S.</div>
 		<div class="mainButton" *ngIf="!isReady && language=='french'" (click)="ready()">Clickez sur ce boutton pour jouer dans {{waitingTime}}S.</div>
 		<div class="loapart" *ngIf="isReady && language=='english'">You are ready!</div>
@@ -168,28 +168,48 @@
 			</div>
 				</div>
 		<div class="comms" style="height: 40%;">
-			<button class="commButton1">
+			<button class="commButton1" *ngIf="language=='english'">
 				Please refill water tank
 				<div class="char"> w </div>
 			</button>
-			<button class="commButton1" >
+			<button class="commButton1" *ngIf="language=='french'">
+				Remplis le réservoir
+				<div class="char"> w </div>
+			</button>
+			<button class="commButton1" *ngIf="language=='english'">
 				I'm going to refuel
 				<div class="char"> x </div>
 			</button>
-			<button class="commButton2" >
+			<button class="commButton1" *ngIf="language=='french'">
+				Je vais recharger
+				<div class="char"> x </div>
+			</button>
+			<button class="commButton2" *ngIf="language=='english'">
 				Need water
 				<div class="char"> c </div>
 			</button>
-			<button class="commButton2" >
+			<button class="commButton2" *ngIf="language=='french'">
+				J'ai besoin d'eau
+				<div class="char"> c </div>
+			</button>
+			<button class="commButton2" *ngIf="language=='english'">
 				Need electricity
+				<div class="char"> v </div>
+			</button>
+			<button class="commButton2" *ngIf="language=='french'">
+				J'ai besoin de batterie
 				<div class="char"> v </div>
 			</button>
 			<button class="commButton3" >
 				Ok
 				<div class="char"> b </div>
 			</button>
-			<button class="commButton3" >
+			<button class="commButton3" *ngIf="language=='english'">
 				No
+				<div class="char"> n </div>
+			</button>
+			<button class="commButton3" *ngIf="language=='french'">
+				Non
 				<div class="char"> n </div>
 			</button>
 		</div>

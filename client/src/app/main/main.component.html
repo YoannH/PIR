@@ -1,48 +1,64 @@
 <div class="screen" [ngClass]="{screenWrench: wrenchMode}" >
 	<div [ngClass]="{overlayOpen: overlayOpen}" class="overlay">
 		<div class="gameover" *ngIf="gameOverCause==3 || gameOverCause==4"> GAME OVER! </div>
-        <div class="gameover" *ngIf="gameOverCause==1"> THE END </div>
-		<div class="textthx" *ngIf="gameOverCause==1"> Mission completed, CONGRATULATION! </div>
-		<div class="gameover" *ngIf="gameOverCause==2"> THE OTHER PLAYER DISCONNECTED </div>
+        <div class="gameover" *ngIf="gameOverCause==1 && language=='english'"> THE END </div>
+        <div class="gameover" *ngIf="gameOverCause==1 && language=='french'"> C'est terminé ! </div>
+		<div class="textthx" *ngIf="gameOverCause==1 && language=='english'"> Mission completed, CONGRATULATION! </div>
+		<div class="textthx" *ngIf="gameOverCause==1 && language=='french'"> Mission réussie, BRAVO! </div>
+		<div class="gameover" *ngIf="gameOverCause==2 && language=='english'"> THE OTHER PLAYER DISCONNECTED </div>
+		<div class="gameover" *ngIf="gameOverCause==2 && language=='french'"> L'autre joueur s'est déconnecté </div>
 		<div class="whyover" *ngIf="gameOverCause==3"> 
 			<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> 
-			<div class="textcause"> Batteries empty </div> 
+			<div class="textcause" *ngIf="language=='english'"> Batteries empty </div> 
+			<div class="textcause" *ngIf="language=='french'"> Batteries vides </div> 
 			<i class="fa fa-battery-empty" aria-hidden="true"></i> 
 		</div>
 		<div class="whyover" *ngIf="gameOverCause==4"> 
 			<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> 
-			<div class="textcause"> One player overheated </div> 
+			<div class="textcause" *ngIf="language=='english'"> One player overheated </div> 
+			<div class="textcause" *ngIf="language=='french'"> Surchauffe d'un des joueurs </div> 
 			<i class="fa fa-thermometer-full" aria-hidden="true"></i> 
 		</div>
 		<div class="numextfires"> 
 			<i class="fa fa-users" aria-hidden="true"></i> 
-			<div class='firetext'>The team extinguished {{nbFighted}} fires </div> 
+			<div class='firetext' *ngIf="language=='english'">The team extinguished {{nbFighted}} fires </div> 
+			<div class='firetext' *ngIf="language=='french'">L'équipe a éteint {{nbFighted}} feux </div> 
 			<div class="fireicon"> </div> 	
 		</div>
 		<div class="numextfires"> 
 			
 			<i class="fa fa-user" aria-hidden="true"></i> 
-			<div class="firetext">You personnaly extinguished {{personnalScore}} fires </div> 
+			<div class="firetext" *ngIf="language=='english'">You personnaly extinguished {{personnalScore}} fires </div> 
+			<div class="firetext" *ngIf="language=='french'">Vous avez éteint {{personnalScore}} feux </div> 
 			<div class="fireicon"> </div> 	
 		</div>
 		<div class="newbestscore" *ngIf="newBestScore"> 
-			<span> NEW BEST SCORE! Good job  </span> <span style="color: #05BDFF">{{pseudo1}} & {{pseudo2}}</span> <span>!</span>
+			<span *ngIf="language=='english'"> NEW BEST SCORE! Good job!  </span>
+			<span *ngIf="language=='french'"> NoOUVEAU MEILLEUR SCORE! Bien joué!  </span>
+			<span style="color: #05BDFF">{{pseudo1}} & {{pseudo2}}</span> <span>!</span>
 		</div>
 		<div [routerLink]="['/welcome']" class="gohome"> 
 			<i class="fa fa-reply" aria-hidden="true"></i> 
-			<span> back to main menu </span> 
+			<span *ngIf="language=='english'"> back to main menu </span>
+			<span *ngIf="language=='french'"> retour au menu principal </span> 
 		</div>
 	</div> 
 
 
 	<div [ngClass]="{overlayOpen: alarmOverlayOpen && !overlayOpen}" class="alarmOverlay">
 		<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> 
-		<span class="textAlarm" *ngIf="alarmId==1"> Low water (less than 2 shots)!! </span>
-		<span class="textAlarm" *ngIf="alarmId==2"> Your battery is low!! </span>
-		<span class="textAlarm" *ngIf="alarmId==3"> The other player has no battery anymore!! </span>
-		<span class="textAlarm" *ngIf="alarmId==4"> Your temperature is high!! </span>
-		<span class="textAlarm" *ngIf="alarmId==5"> Only 30s left!! </span>
-		<div class="alarmButton" (click)="removeAlarm()"> I got it </div>	
+		<span class="textAlarm" *ngIf="alarmId==1 && language=='english'"> Low water (less than 2 shots)!! </span>
+		<span class="textAlarm" *ngIf="alarmId==1 && language=='french'"> Peu d'eau (moins de 2 tirs)!! </span>
+		<span class="textAlarm" *ngIf="alarmId==2 && lancuage=='english'"> Your battery is low!! </span>
+		<span class="textAlarm" *ngIf="alarmId==2 && lancuage=='french'"> Votre batterie est faible!! </span>
+		<span class="textAlarm" *ngIf="alarmId==3 && language=='english'"> The other player has no battery anymore!! </span>
+		<span class="textAlarm" *ngIf="alarmId==3 && language=='french'"> L'autre joueur n'a plus de batterie!! </span>
+		<span class="textAlarm" *ngIf="alarmId==4 && language=='english'"> Your temperature is high!! </span>
+		<span class="textAlarm" *ngIf="alarmId==4 && language=='french'"> Votre température est élevée!! </span>
+		<span class="textAlarm" *ngIf="alarmId==5 && language=='english'"> Only 30s left!! </span>
+		<span class="textAlarm" *ngIf="alarmId==5 && language=='french'"> Plus que 30s!! </span>
+		<div class="alarmButton" (click)="removeAlarm()" *ngIf="language=='english'"> I got it </div>	
+		<div class="alarmButton" (click)="removeAlarm()" *ngIf="language=='french'"> J'ai compris </div>	
 	</div> 
 
 	<div class="leftPart">  
@@ -332,28 +348,48 @@
 			</div>
 		</div>
 		<div class="comms">
-			<button class="commButton1" (click)="sendKey('1')">
+			<button class="commButton1" (click)="sendKey('1')" *ngIf="language=='english'">
 				Please refill water tank
 				<div class="char"> w </div>
 			</button>
-			<button class="commButton1" (click)="sendKey('2')">
+			<button class="commButton1" (click)="sendKey('1')" *ngIf="language=='french'">
+				Remplis le réservoir
+				<div class="char"> w </div>
+			</button>
+			<button class="commButton1" (click)="sendKey('2')" *ngIf="language=='english'">
 				I'm going to refuel
 				<div class="char"> x </div>
 			</button>
-			<button class="commButton2" (click)="sendKey('3')">
+			<button class="commButton1" (click)="sendKey('2')" *ngIf="language=='french'">
+				Je vais recharger
+				<div class="char"> x </div>
+			</button>
+			<button class="commButton2" (click)="sendKey('3')" *ngIf="language=='english'">
 				Need water
 				<div class="char"> c </div>
 			</button>
-			<button class="commButton2" (click)="sendKey('4')">
+			<button class="commButton2" (click)="sendKey('3')" *ngIf="language=='french'">
+				J'ai besoin d'eau
+				<div class="char"> c </div>
+			</button>
+			<button class="commButton2" (click)="sendKey('4')" *ngIf="language=='english'">
 				Need electricity
+				<div class="char"> v </div>
+			</button>
+			<button class="commButton2" (click)="sendKey('4')" *ngIf="language=='french'">
+				J'ai besoin de batterie
 				<div class="char"> v </div>
 			</button>
 			<button class="commButton3" (click)="sendKey('5')">
 				Ok
 				<div class="char"> b </div>
 			</button>
-			<button class="commButton3" (click)="sendKey('6')">
+			<button class="commButton3" (click)="sendKey('6')" *ngIf="language=='english'">
 				No
+				<div class="char"> n </div>
+			</button>
+			<button class="commButton3" (click)="sendKey('6')" *ngIf="language=='french'">
+				Non
 				<div class="char"> n </div>
 			</button>
 		</div>
