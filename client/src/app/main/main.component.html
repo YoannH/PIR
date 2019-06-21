@@ -57,6 +57,8 @@
 		<span class="textAlarm" *ngIf="alarmId==4 && language=='french'"> Votre température est élevée!! </span>
 		<span class="textAlarm" *ngIf="alarmId==5 && language=='english'"> Only 30s left!! </span>
 		<span class="textAlarm" *ngIf="alarmId==5 && language=='french'"> Plus que 30s!! </span>
+		<span class="textAlarm" *ngIf="alarmId==6 && language=='english'"> Autonomous mode activated !!</span>
+		<span class="textAlarm" *ngIf="alarmId==6 && language=='french'"> Mode autonome activé !! </span>
 		<div class="alarmButton" (click)="removeAlarm()" *ngIf="language=='english'"> I got it </div>	
 		<div class="alarmButton" (click)="removeAlarm()" *ngIf="language=='french'"> J'ai compris </div>	
 	</div> 

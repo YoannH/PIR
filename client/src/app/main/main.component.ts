@@ -383,6 +383,7 @@ export class MainComponent implements OnInit, OnDestroy {
     
       this.hotScreen = this.temperature/100;
       this.inRange = data.inRange;
+      this.autonomous = data.autonomousMode;
     });
   
     this.language = this.globalDatasService.language;

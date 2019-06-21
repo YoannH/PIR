@@ -1,6 +1,7 @@
 var express = require("express");
 var app = express();
 var fs = require('fs');
+var mkdirp = require('mkdirp');
 
 
 var server = require('http').Server(app);
@@ -11,6 +12,7 @@ var io = require('socket.io')(server);
 //VARIABLES
 var date;
 var wstream;
+var wstreamdialogues;
 var gameTime = 600;
 var waitingTime = 15;
 var remainingTime = 0;
@@ -222,28 +224,28 @@ io.on('connection', (socket) => {
 		var comma = (playerData.stringWriteUsedKeys == "'") ? '' : ',';
 		playerData.stringWriteUsedKeys += comma + data.key;
 
-		if(key == 'upDown'){
+		if(key == 'upDown' && !playerData.autonomousMode){
 			playerData.direction = 1;
 		}
-		else if(key == 'upUp'){
+		else if(key == 'upUp' && !playerData.autonomousMode){
 			playerData.direction = 0;
 		}
-		else if(key =='downDown'){
+		else if(key =='downDown' && !playerData.autonomousMode){
 			playerData.direction = -1;
 		}
-		else if(key =='downUp'){
+		else if(key =='downUp' && !playerData.autonomousMode){
 			playerData.direction = 0;
 		}
-		else if(key =='rightDown'){
+		else if(key =='rightDown' && !playerData.autonomousMode){
 			playerData.rotDirection = 1;
 		}
-		else if(key =='rightUp'){
+		else if(key =='rightUp' && !playerData.autonomousMode){
 			playerData.rotDirection = 0;
 		}
-		else if(key =='leftDown'){
+		else if(key =='leftDown' && !playerData.autonomousMode){
 			playerData.rotDirection = -1;
 		}
-		else if(key =='leftUp'){
+		else if(key =='leftUp' && !playerData.autonomousMode){
 			playerData.rotDirection = 0;
 		}
 		else if(key == 'a'){
@@ -258,7 +260,7 @@ io.on('connection', (socket) => {
 		else if(key == 'd'){
 			faucetCtrlFctPlus();
 		}
-		else if(key == 'space'){
+		else if(key == 'space' && !playerData.autonomousMode){
 			var player = player1Datas;
 			if(data.token == player2){
 				player = player2Datas;
@@ -267,21 +269,27 @@ io.on('connection', (socket) => {
 		}
 		else if(key == '1'){
 			sendMessage(1,data.token);
+			wstreamdialogues.write(remainingTime + ' : ' + playerData.role + ' : Please refill water tank \n');
 		}
 		else if(key == '2'){
 			sendMessage(2,data.token);
+			wstreamdialogues.write(remainingTime + ' : ' + playerData.role + " : I'm going to refuel \n");
 		}
 		else if(key == '3'){
 			sendMessage(3,data.token);
+			wstreamdialogues.write(remainingTime + ' : ' + playerData.role + ' : Need water \n');
 		}
 		else if(key == '4'){
 			sendMessage(4,data.token);
+			wstreamdialogues.write(remainingTime + ' : ' + playerData.role + ' : Need electricity \n');
 		}
 		else if(key == '5'){
 			sendMessage(5,data.token);
+			wstreamdialogues.write(remainingTime + ' : ' + playerData.role + ' : Ok \n');
 		}
 		else if(key == '6'){
 			sendMessage(6,data.token);
+			wstreamdialogues.write(remainingTime + ' : ' + playerData.role + ' : No \n');
 		}
 		else if(key == 'rDown'){
 			trySendWater(data.token);
@@ -341,11 +349,14 @@ var heatThreshold = 10;
 var inRange = false;
 var inRangeThreshold = 10;
 var probaAutonomous = 0.5;
+var tryAutonomousTime = 10000;
+var stopAutonomousTime = 20000;
+var blockAutonomousTime = 10000;
 var probaStopAutonomous = 0.6;
 var autonomousExtinguishThreshold = 8;
 var autonomousCollidingThreshold = 5;
-var autonomousCapThreshold = 0.1;
-var autonomousScalarProdThreshold = 0.7;
+var autonomousCapThreshold = 0.03;
+var autonomousScalarProdThreshold = 0.5;
 
 //Intervals
 var socketStates;
@@ -408,10 +419,12 @@ function initGame(){
 	}
 
 	date = new Date();
-	wstream = fs.createWriteStream('records/record_' + date.getFullYear() + '_' + ('0' + (date.getMonth()+1)).slice(-2) + '_' + ('0' + date.getDate()).slice(-2) + '__' + ('0' + date.getHours()).slice(-2) + '_' + ('0' + date.getMinutes()).slice(-2) + '.txt');
+	dirname = 'records/record_' + date.getFullYear() + '_' + ('0' + (date.getMonth()+1)).slice(-2) + '_' + ('0' + date.getDate()).slice(-2) + '__' + ('0' + date.getHours()).slice(-2) + '_' + ('0' + date.getMinutes()).slice(-2);
+	mkdirp.sync(dirname, function(err){});
+	wstream = fs.createWriteStream(dirname + '/datas.txt');
 	wstream.write('#robot1 : ' + player1Role + ', robot2 : ' + player2Role + '\n');
 	wstream.write('# remaining_time, trees_state, global_score, ground_tank_water_level, leaks, personnal_score1, autonomous1, alarms1, robot1_x, robot1_y, robot1_theta, robot1_battery, robot1_temperature, robot1_waterlevel, robot1_shortkeys, robot1_clicks, personnal_score2, autonomous2, alarms2, robot2_x, robot2_y, robot2_theta, robot2_battery, robot2_temperature, robot2_waterlevel, robot2_shortkeys, robot2_clicks  \n');
-
+	wstreamdialogues = fs.createWriteStream(dirname + '/dialogues.txt');
 	isFinished = false;
 	remainingTime = 600;
 	
@@ -680,8 +693,8 @@ function startGame(){
 		}
 	}, 1000);
 
-	player1Datas.autonomousInterval = setInterval(() => {autonomousFunction(player1Datas);}, 10000);
-	player2Datas.autonomousInterval = setInterval(() => {autonomousFunction(player2Datas);}, 10000);
+	player1Datas.autonomousInterval = setInterval(() => {autonomousFunction(player1Datas);}, tryAutonomousTime);
+	player2Datas.autonomousInterval = setInterval(() => {autonomousFunction(player2Datas);}, tryAutonomousTime);
 
 	sendData = setInterval(() => {
 		if(!isFinished){
@@ -827,7 +840,12 @@ function processPosition(player){
 			player.pos[1] = nextPos.y;
 		}
 		player.pos[2] += player.rotDirection * timeStep * player.rotSpeed; 
-		player.pos[2] = ((player.pos[2] % (2 * Math.PI)) + 2 * Math.PI) %(2*Math.PI);
+		if(player.pos[2] > Math.PI){
+			player.pos[2] -= 2*Math.PI;
+		}
+		if(player.pos[2] < -Math.PI){
+			player.pos[2] += 2*Math.PI;
+		}
 	}
 	for(var i = 0; i<2; i++){
 		if(player.pos[i] < 0){
@@ -940,7 +958,7 @@ function throwWater(player, socket){
 		if(player.waterLevel <= 20 && !player.waterAlarmSent){
 			var comma = (player.stringWriteAlarms == "'") ? '' : ',';
 			player.stringWriteAlarms += comma + '1';
-			socket.emit("alarm", {id : 1})
+			socket.emit("alarm", {id : 1});
 			player.waterAlarmSent = true;
 		}
 	}
@@ -1037,7 +1055,7 @@ function trySendWater(token){
 function tryReceiveWater(token){
 	var giver = (token == player2) ? player1Datas : player2Datas;
 	var receiver = (token == player2) ? player2Datas : player1Datas;
-	var giverSocket = (token == player2) ? socketNb1 : socketNb1;
+	var giverSocket = (token == player2) ? socketNb1 : socketNb2;
 	if(inRange && receiver.waterLevel < receiver.maxWaterLevel && !receiver.givingWater ){
 		receiver.receivingWater = true;
 		if(giver.givingWater){
@@ -1080,7 +1098,7 @@ function trySendBattery(token){
 		giver.givingBattery = true;
 		if(receiver.receivingBattery){
 			exchangeBatteryInterval = setInterval( () => {
-				if(inRange && giver.battery > 0 && giver.givingBattery && receiver.receivingBattery && receiver.batteryLevel < receiver.maxBatteryLevel){
+				if(inRange && giver.battery > 0 && giver.givingBattery && receiver.receivingBattery && receiver.battery < receiver.maxBatteryLevel){
 					giver.battery -= 1;
 					receiver.battery += 1;
 					if(receiver.ownBatteryAlarmSent && receiver.battery > 20 ){
@@ -1113,10 +1131,10 @@ function trySendBattery(token){
 function tryReceiveBattery(token){
 	var giver = (token == player2) ? player1Datas : player2Datas;
 	var receiver = (token == player2) ? player2Datas : player1Datas;
-	var giverSocket = (token == player2) ? socketNb2 : socketNb1;
-	if(inRange && giver.battery > 0 && receiver.batteryLevel < receiver.maxBatteryLevel && !receiver.givingBattery){
+	var giverSocket = (token == player2) ? socketNb1 : socketNb2;
+	if(inRange && giver.battery > 0 && receiver.battery < receiver.maxBatteryLevel && !receiver.givingBattery){
 		receiver.receivingBattery = true;
-		if(receiver.receivingBattery){
+		if(giver.givingBattery){
 			exchangeBatteryInterval = setInterval( () => {
 				if(inRange &&  giver.givingBattery && receiver.receivingBattery && receiver.batteryLevel < receiver.maxBatteryLevel){
 					giver.battery -= 1;
@@ -1167,7 +1185,18 @@ function killAll(){
 	clearInterval(treeBurningInterval);
 	clearInterval(exchangeBatteryInterval);
 	clearInterval(exchangeWaterInterval);
+	clearInterval(player1Datas.autonomousInterval);
+	clearInterval(player1Datas.stopAutonomousInterval);
+	clearTimeout(player1Datas.autonomousTimeout);
+	clearTimeout(player1Datas.avoidingTimeout);
+	clearInterval(player2Datas.autonomousInterval);
+	clearInterval(player2Datas.stopAutonomousInterval);
+	clearTimeout(player2Datas.autonomousTimeout);
+	clearTimeout(player2Datas.avoidingTimeout);
+	clearInterval(player1Datas.forceStopInterval);
+	clearInterval(player2Datas.forceStopInterval);
 	wstream.end();
+	wstreamdialogues.end();
 	clearInterval(writeDatasInterval);
 	remainingTime = 0;
 	nbPlayers = 0;
@@ -1262,30 +1291,51 @@ function autonomousFunction(player){
 	var p = Math.random();
 	//test d'activation du mode autonome
 	if(p > probaAutonomous && !player.previouslyAutonomous && !player.autonomousMode){
+		var comma = (player.stringWriteAlarms == "'") ? '' : ',';
+		player.stringWriteAlarms += comma + '6';
+		player.socket.emit("alarm", {id : 6})
 		player.autonomousMode = true;
 		player.previouslyAutonomous = true;
 		player.rotDirection = 0;
 		player.direction = 0;
-	}
 
-	//interval d'arrêt aléatoire ou quand t° trop haute
+		//interval d'arrêt aléatoire ou quand t° trop haute
+
+	player.forceStopInterval = setInterval( () => {
+		if(player.temperature > 75){
+			player.autonomousMode = false;
+			player.autonomousTimeout = setTimeout( () => {
+				player.previouslyAutonomous = false;
+			}, blockAutonomousTime);
+			
+			clearInterval(player.autonomousDecisionsInterval);
+			player.rotDirection = 0;
+			player.direction = 0;
+			clearInterval(player.stopAutonomousInterval);
+			clearInterval(player.forceStopInterval);
+		}
+	}, 500);
 
 	player.stopAutonomousInterval = setInterval( () => {
 	
+		
 		var p2 = Math.random();
 		if(p2 > probaStopAutonomous || player.temperature >= 80){
 
 			player.autonomousMode = false;
 			player.autonomousTimeout = setTimeout( () => {
 				player.previouslyAutonomous = false;
-			}, 10000);
-			clearInterval(player.stopAutonomousInterval);
+			}, blockAutonomousTime);
+			
 			clearInterval(player.autonomousDecisionsInterval);
 			player.rotDirection = 0;
 			player.direction = 0;
+			clearInterval(player.stopAutonomousInterval);
+			clearInterval(player.forceStopInterval);
+	
 		
 		}
-	}, 80000);
+	}, stopAutonomousTime);
 
 	player.hasAGoal = false;
 	player.autonomousNextStep = 'computeNextGoal';
@@ -1293,22 +1343,23 @@ function autonomousFunction(player){
 	player.autonomousDecisionsInterval = setInterval( () => {
 		playerPos = { x : player.pos[0], y : player.pos[1]};
 		
+
 		if(player.autonomousNextStep == 'computeNextGoal'){
-			player.autonomousDistanceThreshold = 3;
+			player.autonomousDistanceThreshold = 5;
 			if(player.battery/player.maxBatteryLevel < 0.5){
 				player.hasAGoal = true;
 				player.nextGoal = 'battery'
-				player.nextPos = { x : zonesLocations.batteryZone.x + 5, y : zonesLocations.batteryZone.y + 5};
+				player.goalPos = { x : zonesLocations.batteryZone.x + 5, y : zonesLocations.batteryZone.y + 5};
 			}else if(player.waterLevel/player.maxWaterLevel < 0.5){
 				player.hasAGoal = true;
 				player.nextGoal = 'water'
-				player.nextPos = { x : zonesLocations.waterZone.x + 5, y : zonesLocations.waterZone.y + 5};
+				player.goalPos = { x : zonesLocations.waterZone.x + 5, y : zonesLocations.waterZone.y + 5};
 			}else{
 				var distanceMin = 200;
 				for(var i = 0; i < treesLocations.length; i++){
 					var nextDistance = distance(treesLocations[i], playerPos)
 					if(firesStatesOfTrees[i] == 1 &&  nextDistance < distanceMin){
-						player.nextPos = treesLocations[i];
+						player.goalPos = treesLocations[i];
 						distanceMin = nextDistance;
 						player.hasAGoal = true;
 						player.nextGoal = 'tree';
@@ -1317,37 +1368,65 @@ function autonomousFunction(player){
 				}
 			}
 			if(player.hasAGoal){
+				if(playerPos.x > player.goalPos.x){
+					cap = Math.PI - Math.atan2(player.goalPos.y - playerPos.y,- player.goalPos.x + playerPos.x) ;
+				}else{
+					cap = Math.atan2(player.goalPos.y - playerPos.y, player.goalPos.x - playerPos.x);
+				}
+
+				
 				player.autonomousNextStep = 'orienting';
-				cap = Math.atan2(player.nextPos.y - playerPos.y, player.nextPos.x - playerPos.x);
-				if(cap - player.pos[2] > Math.PI ){
+				var delta = cap - player.pos[2];
+				if(delta < -Math.PI){
+					delta+=2*Math.PI;
+				}
+				if(delta > Math.PI){
+					delta -= 2*Math.PI;
+				}
+				if(delta > 0){
 					player.rotDirection = 1;
 				}else{
 					player.rotDirection = -1;
 				}
 			}
 		}
-		if(player.autonomousNextStep == 'orienting' && Math.abs(Math.atan2(player.nextPos.y - playerPos.y, player.nextPos.x - playerPos.x) - player.pos[2]) < autonomousCapThreshold ){
+		if(player.autonomousNextStep == 'orienting'){
+			if(playerPos.x > player.goalPos.x){
+				cap = Math.PI - Math.atan2(player.goalPos.y - playerPos.y, -player.goalPos.x + playerPos.x) ;
+			}else{
+				cap = Math.atan2(player.goalPos.y - playerPos.y, player.goalPos.x - playerPos.x);
+			}
+			if(cap > Math.PI){
+				cap -= 2*Math.PI;
+			}
+			
+			if(Math.abs(cap - player.pos[2]) < autonomousCapThreshold ){
 				player.autonomousNextStep = 'approach';
-				console.log('coucou');
 				player.rotDirection = 0;
 				player.direction =1;
+			}
 		}
-		if(player.autonomousNextStep == 'approach' && distance(playerPos, player.nextPos) < player.autonomousDistanceThreshold){
+		if(player.autonomousNextStep == 'approach' && distance(playerPos, player.goalPos) < player.autonomousDistanceThreshold){
 			player.direction = 0;
 			if(player.nextGoal == 'battery'){
 				if(player.maxBatteryLevel - player.battery < 5){
 					player.hasAGoal = false;
 					player.autonomousNextStep = 'computeNextGoal';
+					
+
 				}
 			}else if(player.nextGoal == 'water'){
 				if(player.maxWaterLevel - player.waterLevel < 10){
 					player.hasAGoal = false;
 					player.autonomousNextStep = 'computeNextGoal';
+					player.direction = 0;
+
 				}
 			}else if(player.nextGoal == 'tree'){
 				throwWater(player, player.socket);
 				player.hasAGoal = false;
 				player.autonomousNextStep = 'computeNextGoal';
+				player.direction = 0;
 			}
 		}else if(player.autonomousNextStep == 'approach'){
 			treesLocations.forEach( (tree) => {
@@ -1358,38 +1437,65 @@ function autonomousFunction(player){
 					var robotoX = Math.cos(player.pos[2]);
 					var robotoY = Math.sin(player.pos[2]);
 					if(scalarProduct({x : diffX, y: diffY}, {x : robotoX, y : robotoY})  > autonomousScalarProdThreshold){
-						player.avoidingTree = tree;
+						player.avoidingTree = {x : tree.x, y : tree.y};
 						player.direction = 0;
 						player.avoiding = true;
-						player.autonomousNextStep =='avoiding';
+						player.autonomousNextStep ='avoid';
 						player.rotDirection = 1;
 					}
 				}
 			});
 		}
-		if(player.autonomousNextStep == 'avoiding'){
+		if(player.autonomousNextStep == 'avoid'){
 			var distanceToTree = distance(playerPos, player.avoidingTree);
 			var diffX = (player.avoidingTree.x - playerPos.x)/distanceToTree;
 			var diffY = (player.avoidingTree.y - playerPos.y)/distanceToTree;
 			var robotoX = Math.cos(player.pos[2]);
 			var robotoY = Math.sin(player.pos[2]);
-		  if(scalarProduct({x : diffX, y: diffY}, {x : robotoX, y : robotoY}) > autonomousScalarProdThreshold){
+
+		  if(scalarProduct({x : diffX, y: diffY}, {x : robotoX, y : robotoY}) < autonomousScalarProdThreshold){
 				player.rotDirection = 0;
 				player.direction = 1;
-				player.autonomousNextStep == 'avoiding2';
-				setTimeout(() => {
+				player.autonomousNextStep = 'avoiding2';
+				player.avoidingTimeout = setTimeout(() => {
 					player.direction = 0;
 					player.autonomousNextStep = 'orienting';
-					cap = Math.atan2(player.nextPos.y - playerPos.y, player.nextPos.x - playerPos.x);
-					if(cap - player.pos[2] > Math.PI ){
+					if(playerPos.x > player.goalPos.x){
+						cap =  Math.PI - Math.atan2(player.goalPos.y - playerPos.y, -player.goalPos.x + playerPos.x) ;
+					}else{
+						cap = Math.atan2(player.goalPos.y - playerPos.y, player.goalPos.x - playerPos.x);
+					}
+					if(cap > Math.PI){
+						cap -= 2*Math.PI;
+					}
+					var delta = cap - player.pos[2];
+					if(delta < -Math.PI){
+						delta+=2*Math.PI;
+					}
+					if(delta > Math.PI){
+						delta -= 2*Math.PI;
+					}
+					if(delta > 0){
 						player.rotDirection = 1;
 					}else{
-						player.rotDirection -= 1;
+						player.rotDirection = -1;
 					}
-				}, 500);			
+				}, 200);			
 			}
 		}
 	}, 20);
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	}
+
+	
 	
 }
 
