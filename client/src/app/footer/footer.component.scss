@@ -6,9 +6,12 @@ footer.footer {
   }
   
   .container{
+      display : flex;
+      flex-direction: row;
+      justify-content: space-between;
       box-sizing: border-box;
       font-size: 1vw;	
-      width: 50%;
+      width: 90%;
       padding-right: 0px;
       padding-left: 0px;
       margin-right: 0px;
