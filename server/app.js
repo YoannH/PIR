@@ -142,6 +142,8 @@ io.on('connection', (socket) => {
 				else{
 					nbPlayers--;
 					player1 = token;
+					socketNb1 = socketNb2;
+					//
 				}
 			}
 		}else{
@@ -348,7 +350,7 @@ var heatFactor = 1.5;
 var heatThreshold = 10;
 var inRange = false;
 var inRangeThreshold = 10;
-var probaAutonomous = 0.5;
+var probaAutonomous = 0.4;
 var tryAutonomousTime = 10000;
 var stopAutonomousTime = 20000;
 var blockAutonomousTime = 10000;
@@ -357,6 +359,7 @@ var autonomousExtinguishThreshold = 8;
 var autonomousCollidingThreshold = 5;
 var autonomousCapThreshold = 0.03;
 var autonomousScalarProdThreshold = 0.5;
+var probaAlarms = 0.7
 
 //Intervals
 var socketStates;
@@ -377,6 +380,10 @@ var isFinished;
 
 var teamScore;
 var newBestScore;
+
+var writeDatasInterval;
+
+var pAlarm;
 
 
 
@@ -585,13 +592,15 @@ function startGame(){
 		if(player2Datas.temperature < 0){
 			player2Datas.temperature = 0;
 		}
-		if(player1Datas.temperature >= 70 && !player1Datas.temperatureAlarmSent){
+		pAlarm = Math.random();
+		if(player1Datas.temperature >= 70 && !player1Datas.temperatureAlarmSent && pAlarm < probaAlarms){
 			player1Datas.temperatureAlarmSent = true;
 			var comma = (player1Datas.stringWriteAlarms == "'") ? '' : ',';
 			player1Datas.stringWriteAlarms += comma + '4';
 			socketNb1.emit("alarm", {id : 4});
 		}
-		if(player2Datas.temperature >= 70 && !player2Datas.temperatureAlarmSent){
+		pAlarm
+		if(player2Datas.temperature >= 70 && !player2Datas.temperatureAlarmSent && pAlarm < probaAlarms){
 			player2Datas.temperatureAlarmSent = true;
 			var comma = (player2Datas.stringWriteAlarms == "'") ? '' : ',';
 			player2Datas.stringWriteAlarms += comma + '4';
@@ -616,7 +625,8 @@ function startGame(){
 			if(player1Datas.noBattery){
 				player1Datas.noBattery = false;
 			}
-			if(!player1Datas.ownBatteryAlarmSent && player1Datas.battery <= 20){
+			pAlarm = Math.random();
+			if(!player1Datas.ownBatteryAlarmSent && player1Datas.battery <= 20 && pAlarm < probaAlarms){
 				var comma = (player1Datas.stringWriteAlarms == "'") ? '' : ',';
 				player1Datas.stringWriteAlarms += comma + '2';
 				player1Datas.ownBatteryAlarmSent = true;
@@ -624,7 +634,8 @@ function startGame(){
 			}
 		}else{
 			player1Datas.noBattery = true;
-			if(!player2Datas.otherBatteryAlarmSent){
+			pAlarm = Math.random();
+			if(!player2Datas.otherBatteryAlarmSent && pAlarm < probaAlarms){
 				var comma = (player2Datas.stringWriteAlarms == "'") ? '' : ',';
 				player2Datas.stringWriteAlarms += comma + '3';
 				player2Datas.otherBatteryAlarmSent = true;
@@ -637,15 +648,17 @@ function startGame(){
 				player2Datas.noBattery = false;
 			}
 			player2Datas.battery--;
-			if(!player2Datas.ownBatteryAlarmSent && player2Datas.battery <= 20){
+			pAlarm = Math.random();
+			if(!player2Datas.ownBatteryAlarmSent && player2Datas.battery <= 20 && pAlarm < probaAlarms){
 				var comma = (player2Datas.stringWriteAlarms == "'") ? '' : ',';
 				player2Datas.stringWriteAlarms += comma + '2';
 				player2Datas.ownBatteryAlarmSent = true;
 				socketNb2.emit("alarm", {id : 2});
 			}
 		}else{
+			pAlarm = Math.random();
 			player2Datas.noBattery = true;
-			if(!player1Datas.otherBatteryAlarmSent){
+			if(!player1Datas.otherBatteryAlarmSent && pAlarm < probaAlarms){
 				var comma = (player1Datas.stringWriteAlarms == "'") ? '' : ',';
 				player1Datas.stringWriteAlarms += comma + '3';
 				player1Datas.otherBatteryAlarmSent = true;
@@ -679,7 +692,8 @@ function startGame(){
 	timer = setInterval(() => {
 		if(!isFinished && remainingTime > 0){
 			remainingTime--;
-			if(remainingTime == 30){
+			pAlarm = Math.random();
+			if(remainingTime == 30 && pAlarm < probaAlarms){
 				var comma = (player1Datas.stringWriteAlarms == "'") ? '' : ',';
 				player1Datas.stringWriteAlarms += comma + '5';
 				comma = (player2Datas.stringWriteAlarms == "'") ? '' : ',';
@@ -693,8 +707,8 @@ function startGame(){
 		}
 	}, 1000);
 
-	player1Datas.autonomousInterval = setInterval(() => {autonomousFunction(player1Datas);}, tryAutonomousTime);
-	player2Datas.autonomousInterval = setInterval(() => {autonomousFunction(player2Datas);}, tryAutonomousTime);
+	player1Datas.autonomousInterval = setInterval(() => {autonomousFunction(player1Datas, player2Datas);}, tryAutonomousTime);
+	player2Datas.autonomousInterval = setInterval(() => {autonomousFunction(player2Datas, player2Datas);}, tryAutonomousTime);
 
 	sendData = setInterval(() => {
 		if(!isFinished){
@@ -955,7 +969,8 @@ function throwWater(player, socket){
 		player.waterLevel -= 10;
 		socket.emit("waterThrowed", {});
 		waterThrowed = true;
-		if(player.waterLevel <= 20 && !player.waterAlarmSent){
+		pAlarm = Math.random();
+		if(player.waterLevel <= 20 && !player.waterAlarmSent && pAlarm < probaAlarms){
 			var comma = (player.stringWriteAlarms == "'") ? '' : ',';
 			player.stringWriteAlarms += comma + '1';
 			socket.emit("alarm", {id : 1});
@@ -1028,7 +1043,8 @@ function trySendWater(token){
 					if(receiver.waterAlarmSent && receiver.waterLevel > 20 ){
 						receiver.waterAlarmSent = false;
 					}
-					if(!giver.waterAlarmSent && giver.waterLevel <= 20 ){
+					pAlarm = Math.random();
+					if(!giver.waterAlarmSent && giver.waterLevel <= 20 && pAlarm < probaAlarms ){
 						giver.waterAlarmSent = true;
 						if(token == player1){
 							var comma = (player1Datas.stringWriteAlarms == "'") ? '' : ',';
@@ -1066,7 +1082,8 @@ function tryReceiveWater(token){
 					if(receiver.waterAlarmSent && receiver.waterLevel > 20 ){
 						receiver.waterAlarmSent = false;
 					}
-					if(!giver.waterAlarmSent && giver.waterLevel <= 20 ){
+					pAlarm = Math.random();
+					if(!giver.waterAlarmSent && giver.waterLevel <= 20 && pAlarm < probaAlarms ){
 						giver.waterAlarmSent = true;
 						if(token == player1){
 							var comma = (player2Datas.stringWriteAlarms == "'") ? '' : ',';
@@ -1104,7 +1121,8 @@ function trySendBattery(token){
 					if(receiver.ownBatteryAlarmSent && receiver.battery > 20 ){
 						receiver.ownBatteryAlarmSent = false;
 					}
-					if(!giver.ownBatteryAlarmSent && giver.battery <= 20 ){
+					pAlarm = Math.random();
+					if(!giver.ownBatteryAlarmSent && giver.battery <= 20 && pAlarm < probaAlarms){
 						giver.ownBatteryAlarmSent = true;
 						if(token == player1){
 							var comma = (player1Datas.stringWriteAlarms == "'") ? '' : ',';
@@ -1142,7 +1160,9 @@ function tryReceiveBattery(token){
 					if(receiver.ownBatteryAlarmSent && receiver.battery > 20 ){
 						receiver.ownBatteryAlarmSent = false;
 					}
-					if(!giver.ownBatteryAlarmSent && giver.battery <= 20 ){
+
+					pAlarm = Math.random();
+					if(!giver.ownBatteryAlarmSent && giver.battery <= 20 && pAlarm < probaAlarms ){
 						giver.ownBatteryAlarmSent = true;
 						if(token == player1){
 							var comma = (player2Datas.stringWriteAlarms == "'") ? '' : ',';
@@ -1195,6 +1215,8 @@ function killAll(){
 	clearTimeout(player2Datas.avoidingTimeout);
 	clearInterval(player1Datas.forceStopInterval);
 	clearInterval(player2Datas.forceStopInterval);
+	clearInterval(player1Datas.refillingWaterInterval);
+	clearInterval(player2Datas.refillingWaterInterval);
 	wstream.end();
 	wstreamdialogues.end();
 	clearInterval(writeDatasInterval);
@@ -1286,14 +1308,18 @@ function leakPlacesString(){
 }
 
 
-function autonomousFunction(player){
+function autonomousFunction(player, otherPlayer){
 	var cap;
 	var p = Math.random();
 	//test d'activation du mode autonome
-	if(p > probaAutonomous && !player.previouslyAutonomous && !player.autonomousMode){
-		var comma = (player.stringWriteAlarms == "'") ? '' : ',';
-		player.stringWriteAlarms += comma + '6';
-		player.socket.emit("alarm", {id : 6})
+	
+	if(p < probaAutonomous && !player.previouslyAutonomous && !player.autonomousMode && !otherPlayer.autonomousMode){
+		pAlarm = Math.random();
+		if(pAlarm < probaAlarms){
+			var comma = (player.stringWriteAlarms == "'") ? '' : ',';
+			player.stringWriteAlarms += comma + '6';
+			player.socket.emit("alarm", {id : 6});
+		}
 		player.autonomousMode = true;
 		player.previouslyAutonomous = true;
 		player.rotDirection = 0;
@@ -1302,7 +1328,7 @@ function autonomousFunction(player){
 		//interval d'arrêt aléatoire ou quand t° trop haute
 
 	player.forceStopInterval = setInterval( () => {
-		if(player.temperature > 75){
+		if(player.temperature > 75 || player.autonomousNextStep == 'avoid'){
 			player.autonomousMode = false;
 			player.autonomousTimeout = setTimeout( () => {
 				player.previouslyAutonomous = false;
@@ -1320,7 +1346,7 @@ function autonomousFunction(player){
 	
 		
 		var p2 = Math.random();
-		if(p2 > probaStopAutonomous || player.temperature >= 80){
+		if(p2 < probaStopAutonomous || player.temperature >= 80){
 
 			player.autonomousMode = false;
 			player.autonomousTimeout = setTimeout( () => {
