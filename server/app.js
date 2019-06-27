@@ -142,7 +142,7 @@ io.on('connection', (socket) => {
 				else{
 					nbPlayers--;
 					player1 = token;
-					socketNb1 = socketNb2;
+					socketNb1 = socket;
 					//
 				}
 			}
